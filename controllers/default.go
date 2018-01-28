@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/lucifinil-long/stores/config"
 	"github.com/lucifinil-long/stores/models"
 	"github.com/lucifinil-long/stores/proto"
+	"github.com/lucifinil-long/stores/utils"
 	"github.com/mkideal/log"
 )
 
@@ -37,4 +40,132 @@ func (mc *MainController) TreeMenu() {
 	}
 
 	mc.Response(rsp)
+}
+
+// IsLoggedIn handles user login status request
+func (mc *MainController) IsLoggedIn() {
+	userinfo := mc.GetSession(cSessionUserInfoKey)
+
+	configs := config.GetConfigs()
+	res := &proto.IsLoggedInRes{
+		Status:   false,
+		Redirect: configs.AuthGateway(),
+	}
+	rsp := &proto.Response{
+		Status:   proto.ReturnStatusSuccess,
+		Protocol: res,
+	}
+
+	if userinfo != nil {
+		rsp.Description = cTipLoggedin
+		res.Status = true
+		res.Redirect = configs.Homepage()
+	} else {
+		rsp.Description = cTipRelogin
+	}
+
+	mc.Response(rsp)
+}
+
+// Logout handles logout request
+func (mc *MainController) Logout() {
+	mc.OperationLog(cActionLoginOut, cRspSuccess)
+
+	mc.DelSession(cSessionUserInfoKey)
+
+	mc.Response(&proto.Response{
+		Status:      proto.ReturnStatusTempRedirect,
+		Description: cTipRelogin,
+		Protocol:    config.GetConfigs().AuthGateway(),
+	})
+}
+
+// Login handles login request
+func (mc *MainController) Login() {
+	username := mc.GetString(cUsername)
+	password := mc.GetString(cPassword)
+	user, err := CheckLogin(username, password)
+	res := &proto.LoginRes{}
+	rsp := &proto.Response{
+		Protocol: res,
+	}
+	if err == nil {
+		mc.SetSession(cSessionUserInfoKey, *user)
+		accesslist, _ := models.GetUserAccessList(user.ID)
+		mc.SetSession(cSessionAccessListKey, accesslist)
+
+		// update last logintime
+		//models.UpdateUserLoginTime(session, user.Id)
+		mc.OperationLog(cActionLogin, cRspLoginSuccess)
+
+		res.Redirect = config.GetConfigs().Homepage()
+		res.User = *user
+
+		rsp.Status = proto.ReturnStatusSuccess
+		rsp.Description = cRspLoginSuccess
+		rsp.Protocol = res
+	} else {
+		log.Error("MainController.Login: login failed with error: %v", err)
+		mc.OperationLog(cActionLogin, fmt.Sprintf("%v login failed with %v", username, err))
+		rsp.Status = proto.ReturnStatusFailed
+		rsp.Description = err.Error()
+	}
+
+	mc.Response(rsp)
+}
+
+// ChangePassword handles change password request
+func (mc *MainController) ChangePassword() {
+	userinfo := mc.GetSession(cSessionUserInfoKey)
+	if userinfo == nil {
+		mc.Response(&proto.Response{
+			Status:      proto.ReturnStatusTempRedirect,
+			Description: cTipRelogin,
+			Protocol:    config.GetConfigs().AuthGateway(),
+		})
+		return
+	}
+	oldPwd := mc.GetString(cOld)
+	newPwd := mc.GetString(cNew)
+	repeatPwd := mc.GetString(cRepeat)
+	if newPwd != repeatPwd {
+		mc.Response(&proto.Response{
+			Status:      proto.ReturnStatusFailed,
+			Description: cTipDifferentPwd,
+			Protocol:    "",
+		})
+		return
+	}
+
+	user, err := CheckLogin(userinfo.(proto.User).Username, oldPwd)
+	if err == nil {
+		err = models.UpdateUserPassword(user.ID, utils.String2MD5(newPwd))
+
+		if err == nil {
+			mc.OperationLog(cActionModifyPwd, cTipModifyPwdSuccessfully)
+			mc.Response(&proto.Response{
+				Status:      proto.ReturnStatusSuccess,
+				Description: cTipModifyPwdSuccessfully,
+				Protocol:    "",
+			})
+		} else {
+			mc.OperationLog(cActionModifyPwd, fmt.Sprintf("failed with %v", err))
+			mc.Response(&proto.Response{
+				Status:      proto.ReturnStatusFailed,
+				Description: err.Error(),
+				Protocol:    "",
+			})
+		}
+
+		return
+	}
+
+	log.Info("MainController.ChangePassword: user '%v' modified password failed with %v",
+		userinfo.(proto.User).Username, err)
+	mc.OperationLog(cActionModifyPwd, fmt.Sprintf("failed with %v", err))
+	mc.Response(&proto.Response{
+		Status:      proto.ReturnStatusFailed,
+		Description: cTipWrongPwd,
+		Protocol:    "",
+	})
 }

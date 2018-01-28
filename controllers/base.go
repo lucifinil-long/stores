@@ -9,6 +9,7 @@ import (
 	"github.com/lucifinil-long/stores/config"
 	"github.com/lucifinil-long/stores/models"
 	"github.com/lucifinil-long/stores/proto"
+	"github.com/lucifinil-long/stores/utils"
 	"github.com/mkideal/log"
 )
 
@@ -176,5 +177,18 @@ func AccessDecision(params []string, accesslist map[string]bool) bool {
 // @param password is the correspond password that be checked
 // @return (*proto.User, nil) if validate user infomation successfuly, otherwise return (nil, error)
 func CheckLogin(username, password string) (*proto.User, error) {
-	return models.CheckUserInfo(username, password)
+	user, err := models.GetUserInfoByUsername(username)
+	if err != nil {
+		return nil, err
+	}
+
+	passwordMd5 := strings.ToLower(utils.String2MD5(password))
+	password = strings.ToLower(password)
+	userDBPwd := strings.ToLower(user.Password)
+
+	if userDBPwd != password && userDBPwd != passwordMd5 {
+		return nil, models.ErrUserWrongPwd
+	}
+
+	return user, nil
 }

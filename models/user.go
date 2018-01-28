@@ -1,13 +1,10 @@
 package models
 
 import (
-	"strings"
-
 	"github.com/go-xorm/xorm"
 	"github.com/lucifinil-long/stores/config"
 	"github.com/lucifinil-long/stores/models/db"
 	"github.com/lucifinil-long/stores/proto"
-	"github.com/lucifinil-long/stores/utils"
 	"github.com/mkideal/log"
 )
 
@@ -74,6 +71,7 @@ func dbUser2ProtoUser(user *db.StoresUser) *proto.User {
 		ID:            user.Id,
 		Username:      user.Username,
 		Nickname:      user.Nickname,
+		Password:      user.Password,
 		Mobile:        user.Mobile,
 		Remark:        user.Remark,
 		Status:        user.Status,
@@ -83,16 +81,15 @@ func dbUser2ProtoUser(user *db.StoresUser) *proto.User {
 	}
 }
 
-// CheckUserInfo validates login info
+// GetUserInfoByUsername validates login info
 // @param session is database xorm session
-// @param username is the username that be checked
-// @param password is the correspond password that be checked
-// @return (*proto.User, nil) if validate user infomation successfuly, otherwise return (nil, error)
-func CheckUserInfo(username, password string) (*proto.User, error) {
+// @param username is the username of user that be retrived information
+// @return (*proto.User, nil) if get user infomation successfuly, otherwise return (nil, error)
+func GetUserInfoByUsername(username string) (*proto.User, error) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
-	user, err := checkUserInfo(session, username, password)
+	user, err := getUserInfoByUsername(session, username)
 	if err != nil {
 		return nil, err
 	}
@@ -100,17 +97,11 @@ func CheckUserInfo(username, password string) (*proto.User, error) {
 	return dbUser2ProtoUser(user), nil
 }
 
-// CheckUserInfo validates login info
+// getUserInfoByUsername validates login info
 // @param session is database xorm session
-// @param username is the username that be checked
-// @param password is the correspond password that be checked
-// @return (*db.StoresUser, nil) if validate user infomation successfuly, otherwise return (nil, error)
-func checkUserInfo(session *xorm.Session, username, password string) (*db.StoresUser, error) {
-	if session == nil {
-		session = config.GetConfigs().OrmEngine.NewSession()
-		defer session.Close()
-	}
-
+// @param username is the username of user that be retrived information
+// @return (*db.StoresUser, nil) if get user infomation successfuly, otherwise return (nil, error)
+func getUserInfoByUsername(session *xorm.Session, username string) (*db.StoresUser, error) {
 	user := &db.StoresUser{}
 	found, err := session.Where("username=?", username).Get(user)
 
@@ -129,13 +120,24 @@ func checkUserInfo(session *xorm.Session, username, password string) (*db.Stores
 		return nil, ErrUserDisabled
 	}
 
-	passwordMd5 := strings.ToLower(utils.String2MD5(password))
-	password = strings.ToLower(password)
-	userDBPwd := strings.ToLower(user.Password)
+	return user, nil
+}
 
-	if userDBPwd != password && userDBPwd != passwordMd5 {
-		return nil, ErrUserWrongPwd
+// UpdateUserPassword update user's password
+func UpdateUserPassword(uid int, newPwd string) error {
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+
+	return updateUserPassword(session, uid, newPwd)
+}
+
+func updateUserPassword(session *xorm.Session, uid int, newPwd string) error {
+	user := db.StoresUser{
+		Id:       uid,
+		Password: newPwd,
 	}
 
-	return user, nil
+	_, err := session.Table(user).Where("id = ?", uid).Cols("password").Update(user)
+
+	return err
 }

@@ -56,9 +56,9 @@ const (
 
 // Response 是非页面接口api 统一返回数据结构
 type Response struct {
-	Status      int         `json:"status"`      // 返回码(参见枚举 ReturnStatus)
-	Description string      `json:"description"` // 返回码描述
-	Protocol    interface{} `json:"protocol"`    // 协议数据
+	Status      int         `json:"status"`   // 返回码(参见枚举 ReturnStatus)
+	Description string      `json:"info"`     // 返回码描述
+	Protocol    interface{} `json:"protocol"` // 协议数据
 }
 
 // ReqCommon is common base request struct
@@ -221,6 +221,7 @@ type AccessListRes []AccessTreeNode
 type User struct {
 	ID            int    `json:"id"`       // 用户ID
 	Username      string `json:"username"` // 用户登录名
+	Password      string
 	Nickname      string `json:"nickname"` // 用户昵称
 	Mobile        string `json:"mobile"`   // 用户手机
 	Remark        string `json:"remark"`   // 备注
@@ -246,7 +247,7 @@ type UserListRes struct {
 
 // NewUser is new user entry
 type NewUser struct {
-	Username string `json:"username"` // ���户登录名，必填项
+	Username string `json:"username"` // ��������登录名，必填项
 	Nickname string `json:"nickname"` // 用户昵称
 	Password string `json:"password"` // 用户密码
 	Mobile   string `json:"mobile"`   // 用户手机

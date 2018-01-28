@@ -17,4 +17,8 @@ func init() {
 
 	// hompage related APIs
 	beego.Router("/public/treemenu", &controllers.MainController{}, "*:TreeMenu")
+	beego.Router("/public/isloggedin", &controllers.MainController{}, "*:IsLoggedIn")
+	beego.Router("/public/login", &controllers.MainController{}, "*:Login")
+	beego.Router("/public/logout", &controllers.MainController{}, "*:Logout")
+	beego.Router("/public/changepwd", &controllers.MainController{}, "*:ChangePassword")
 }
