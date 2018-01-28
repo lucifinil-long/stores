@@ -10,11 +10,16 @@ const (
 	cJSONKey  = "json"
 	cUserInfo = "userinfo"
 
-	cUsername = "username"
-	cPassword = "password"
-	cOld      = "old"
-	cNew      = "new"
-	cRepeat   = "repeat"
+	cUsername      = "username"
+	cPassword      = "password"
+	cOld           = "old"
+	cNew           = "new"
+	cRepeat        = "repeat"
+	cPage          = "page"
+	cRows          = "rows"
+	cSort          = "sort"
+	cOrder         = "order"
+	cSortDirection = "desc"
 )
 
 const (

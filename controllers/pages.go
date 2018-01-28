@@ -23,14 +23,14 @@ func (pc *PageController) LoginPage() {
 	pc.TplName = "easyui/public/login.tpl"
 }
 
-// AdminUsersPage handles logs page request
-func (pc *PageController) AdminUsersPage() {
+// UsersPage handles logs page request
+func (pc *PageController) UsersPage() {
 	pc.TplName = "easyui/admin/user.tpl"
 	pc.OperationLog(cActionViewUserList)
 }
 
-// AdminOperationsPage handles logs page request
-func (pc *PageController) AdminOperationsPage() {
+// OperationsPage handles logs page request
+func (pc *PageController) OperationsPage() {
 	pc.TplName = "easyui/admin/operations.tpl"
 	pc.OperationLog(cActionViewOperationLogsList)
 }

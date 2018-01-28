@@ -95,7 +95,7 @@ func (mc *MainController) Login() {
 		mc.SetSession(cSessionAccessListKey, accesslist)
 
 		// update last logintime
-		//models.UpdateUserLoginTime(session, user.Id)
+		models.UpdateUserLoginTime(user.ID)
 		mc.OperationLog(cActionLogin, cRspLoginSuccess)
 
 		res.Redirect = config.GetConfigs().Homepage()

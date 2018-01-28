@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/go-xorm/xorm"
 	"github.com/lucifinil-long/stores/config"
 	"github.com/lucifinil-long/stores/models/db"
@@ -123,7 +125,32 @@ func getUserInfoByUsername(session *xorm.Session, username string) (*db.StoresUs
 	return user, nil
 }
 
+// UpdateUserLoginTime updates user last login time
+// @param uid is the user id of specified user
+func UpdateUserLoginTime(uid int) {
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+
+	updateUserLoginTime(session, uid)
+}
+
+// updateUserLoginTime updates user last login time to DB
+// @param session is the database session, can not be nil
+// @param uid is the user id of specified user
+func updateUserLoginTime(session *xorm.Session, uid int) {
+	user := db.StoresUser{Id: uid, LastLoginTime: time.Now()}
+	updates, err := session.Table(user).Where("id=?", uid).Cols("last_login_time").Update(user)
+	if err != nil || updates != 1 {
+		log.Error("models.updateUserLoginTime: updated record with error: %v, update count: %v", err, updates)
+	} else {
+		log.Trace("models.updateUserLoginTime: updated user (ID:%v) login time", uid)
+	}
+}
+
 // UpdateUserPassword update user's password
+// @param uid is the user id of the user will be updated
+// @param newPwd is new password for the user
+// @return nil if successfully, otherwise return error
 func UpdateUserPassword(uid int, newPwd string) error {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
@@ -131,6 +158,11 @@ func UpdateUserPassword(uid int, newPwd string) error {
 	return updateUserPassword(session, uid, newPwd)
 }
 
+// updateUserPassword update user's password to DB
+// @param session is the database session, can not be nil
+// @param uid is the user id of the user will be updated
+// @param newPwd is new password for the user
+// @return nil if successfully, otherwise return error
 func updateUserPassword(session *xorm.Session, uid int, newPwd string) error {
 	user := db.StoresUser{
 		Id:       uid,
@@ -140,4 +172,63 @@ func updateUserPassword(session *xorm.Session, uid int, newPwd string) error {
 	_, err := session.Table(user).Where("id = ?", uid).Cols("password").Update(user)
 
 	return err
+}
+
+// GetUserList get user list
+// @param page is the current page index
+// @param pageSize is the page size
+// @param sort is the table column name that used to be sorted
+// @param desc indicates whether sort data desc
+// @return ([]proto.User, total record count, nil) if successfully, otherwise return (empty []proto.User, 0, error)
+func GetUserList(pageIndex, pageSize int, sort string, desc bool) ([]proto.User, int64, error) {
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+
+	return getUserList(session, pageIndex, pageSize, sort, desc)
+}
+
+// getUserList get user list from DB
+// @param session is the database session, can not be nil
+// @param pageIndex is the current page index
+// @param pageSize is the page size
+// @param sort is the table column name that used to be sorted
+// @param desc indicates whether sort data desc
+// @return ([]proto.User, total record count, nil) if successfully, otherwise return (empty []proto.User, 0, error)
+func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, desc bool) ([]proto.User, int64, error) {
+	records := make([]*db.StoresUser, 0)
+	offset := 0
+	if pageIndex > 1 {
+		offset = (pageIndex - 1) * pageSize
+	}
+	session.Table(cTableStoresUser).
+		Cols("id,username,nickname,mobile,remark,status,last_login_time,created_time").
+		Limit(pageSize, offset)
+	if len(sort) > 0 {
+		if desc {
+			session.Desc(sort)
+		} else {
+			session.Asc(sort)
+		}
+	}
+
+	err := session.Find(&records)
+	sql, params := session.LastSQL()
+	log.Trace("models.getUserList: query sql: `%v`, parameters: %v", sql, params)
+
+	if err != nil {
+		return []proto.User{}, 0, err
+	}
+
+	count, err := session.Table(cTableStoresUser).Count()
+	if err != nil {
+		return []proto.User{}, 0, err
+	}
+
+	ret := make([]proto.User, 0, len(records))
+	for _, record := range records {
+		user := dbUser2ProtoUser(record)
+		ret = append(ret, *user)
+	}
+
+	return ret, count, err
 }
