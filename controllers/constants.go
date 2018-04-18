@@ -7,6 +7,13 @@ const (
 )
 
 const (
+	cUpdates = "updates"
+	cInserts = "inserts"
+	cDeletes = "deletes"
+	cUpdated = "updated"
+)
+
+const (
 	cJSONKey  = "json"
 	cUserInfo = "userinfo"
 
@@ -26,6 +33,7 @@ const (
 	cActionLogin                 = "用户登录"
 	cActionLoginOut              = "用户登出"
 	cActionModifyPwd             = "修改登录密码"
+	cActionAddUser               = "添加用户"
 	cActionViewUserList          = "查看仓储管理系统用户列表"
 	cActionViewOperationLogsList = "查看仓储管理系统操作日志"
 )
@@ -44,4 +52,20 @@ const (
 	cRspSuccess      = "Success"
 	cRspInteralError = "服务器内部错误"
 	cRspLoginSuccess = "登录成功"
+)
+
+const (
+	cFailed            = "失败"
+	cSuccess           = "成功"
+	cAddUserFailed     = "添加用户失败"
+	cAddUserSuccess    = "添加用户成功"
+	cUpdateUserFailed  = "更新用户失败"
+	cUpdateUserSuccess = "更新用户成功"
+	cDeleteUserFailed  = "删除用户失败"
+	cDeleteUserSuccess = "删除用户成功"
+)
+
+const (
+	cErrorFormat    = "错误：%v"
+	cUserInfoFormat = "用户ID：%v 用户名： %v"
 )

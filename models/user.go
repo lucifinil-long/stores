@@ -10,6 +10,67 @@ import (
 	"github.com/mkideal/log"
 )
 
+// dbUser2ProtoUser translate db user to protocol user
+func dbUser2ProtoUser(user *db.StoresUser) *proto.User {
+	if user == nil {
+		return &proto.User{}
+	}
+
+	return &proto.User{
+		ID:            user.Id,
+		Username:      user.Username,
+		Nickname:      user.Nickname,
+		Password:      user.Password,
+		Mobile:        user.Mobile,
+		Remark:        user.Remark,
+		Status:        user.Status,
+		Level:         user.Level,
+		LastLoginTime: user.LastLoginTime.Format("2006-01-02T15:04:05-07:00"),
+		CreatedTime:   user.CreatedTime.Format("2006-01-02T15:04:05-07:00"),
+	}
+}
+
+// protoUser2DBUser translate protocol user to db user
+func protoUser2DBUser(user *proto.User) *db.StoresUser {
+	if user == nil {
+		return &db.StoresUser{}
+	}
+
+	loginTime, _ := time.Parse("2006-01-02T15:04:05-07:00", user.LastLoginTime)
+	cretedTime, _ := time.Parse("2006-01-02T15:04:05-07:00", user.CreatedTime)
+	return &db.StoresUser{
+		Id:            user.ID,
+		Username:      user.Username,
+		Nickname:      user.Nickname,
+		Password:      user.Password,
+		Mobile:        user.Mobile,
+		Remark:        user.Remark,
+		Status:        user.Status,
+		Level:         user.Level,
+		LastLoginTime: loginTime,
+		CreatedTime:   cretedTime,
+	}
+}
+
+// protoUser2DBUser translate protocol user to db user
+func protoNewUser2DBUser(user *proto.NewUser) *db.StoresUser {
+	if user == nil {
+		return &db.StoresUser{}
+	}
+
+	return &db.StoresUser{
+		Id:            0,
+		Username:      user.Username,
+		Nickname:      user.Nickname,
+		Password:      user.Password,
+		Mobile:        user.Mobile,
+		Remark:        user.Remark,
+		Status:        user.Status,
+		CreatedTime:   time.Now(),
+		LastLoginTime: time.Now(),
+	}
+}
+
 // IsSuperAdmin test whether user is super administrator role
 func IsSuperAdmin(user *proto.User) bool {
 	return user != nil && user.Level == -1
@@ -65,22 +126,6 @@ func getUserAccessList(session *xorm.Session, uid int, onlyAuthNode bool) ([]*db
 	log.Trace("models.GetUserAccessList: query sql: `%v`, parameters: %v", sql, params)
 
 	return records, err
-}
-
-// dbUser2ProtoUser translate db user to protocol user
-func dbUser2ProtoUser(user *db.StoresUser) *proto.User {
-	return &proto.User{
-		ID:            user.Id,
-		Username:      user.Username,
-		Nickname:      user.Nickname,
-		Password:      user.Password,
-		Mobile:        user.Mobile,
-		Remark:        user.Remark,
-		Status:        user.Status,
-		Level:         user.Level,
-		LastLoginTime: user.LastLoginTime.Format("2006-01-02T15:04:05-07:00"),
-		CreatedTime:   user.CreatedTime.Format("2006-01-02T15:04:05-07:00"),
-	}
 }
 
 // GetUserInfoByUsername validates login info
@@ -236,11 +281,54 @@ func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, de
 // AddUser handles add admin user to database request
 // @param user is admin user information
 // @return nil if successful; otherwise return an error
-func AddUser(u *proto.NewUser) error {
-	return nil
+func AddUser(user *proto.NewUser) error {
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+
+	var err error
+	if err = session.Begin(); err != nil {
+		return err
+	}
+
+	err = addUser(session, user)
+	if err != nil {
+		if rollbackErr := session.Rollback(); rollbackErr != nil {
+			log.Error("models.AddUser: rollback failed with %v", rollbackErr)
+		}
+		return err
+	}
+
+	return session.Commit()
 }
 
 // addUser adds db user record and related access
 func addUser(session *xorm.Session, user *proto.NewUser) error {
+	dbUser := protoNewUser2DBUser(user)
+
+	err := addDBUser(session, dbUser)
+	if err != nil {
+		return err
+	}
+
+	if dbUser.Id <= 0 {
+		log.Error("models.addUser: user id (%v) is invalid after add user to database.", dbUser.Id)
+		return ErrCommonInternalError
+	}
+
 	return nil
+}
+
+// addDBUser handles add user to database request
+// @param session is database session, can be nil; if nil will use default database session
+// @param user is db user information
+func addDBUser(session *xorm.Session, user *db.StoresUser) error {
+	if len(user.Username) == 0 {
+		return ErrCommonInvalidParam
+	}
+
+	_, err := session.Insert(user)
+	sql, params := session.LastSQL()
+	log.Trace("models.addDBUser: query sql: `%v`, parameters: %v", sql, params)
+
+	return err
 }

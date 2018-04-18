@@ -26,4 +26,5 @@ func init() {
 
 	// system user related
 	beego.Router("/admin/user/list", &controllers.UserController{}, "*:UserList")
+	beego.Router("/admin/user/add", &controllers.UserController{}, "*:AddUser")
 }
