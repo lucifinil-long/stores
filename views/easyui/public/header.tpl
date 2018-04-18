@@ -12,6 +12,7 @@
     <script type="text/javascript" src="/static/easyui/jquery-easyui/phpjs-min.js"></script>
     <script type="text/javascript" src="/static/easyui/jquery-easyui/locale/easyui-lang-zh_CN.js"></script>
 </head>
+<script type="text/javascript" src="/static/js/loading.js"></script>
 <script type="text/javascript">
 function loadEasyUIData(URL, param, success, error) {
     $.ajax({

@@ -14,7 +14,7 @@ func init() {
 	beego.Router("/", &controllers.PageController{}, "*:Homepage")
 	beego.Router("/pages/index", &controllers.PageController{}, "*:Homepage")
 	beego.Router("/pages/login", &controllers.PageController{}, "*:LoginPage")
-	beego.Router("/pages/admin/user", &controllers.PageController{}, "*:UsersPage")
+	beego.Router("/pages/admin/users", &controllers.PageController{}, "*:UsersPage")
 	beego.Router("/pages/admin/operations", &controllers.PageController{}, "*:OperationsPage")
 
 	// hompage related APIs

@@ -33,17 +33,20 @@ CREATE TABLE `stores_node` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /* 第一级菜单 */
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `auth`, `menu`)   VALUES ('1', '用户设置', '', '1', '0', '0', '1');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `auth`, `menu`)   VALUES ('1', '后台设置', '', '1', '0', '0', '1');
 /* 第二级菜单 */
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('2', '账号管理', '/pages/admin/user', '2', '1', '1');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('3', '操作日志', '/pages/admin/operations', '2', '1', '1');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('2', '用户管理', '/pages/admin/users', '2', '1', '1');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('3', '系统操作日志', '/pages/admin/operations', '2', '1', '1');
 /* 后台用户关联操作 */
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('4', '账号列表', '/admin/user/list', '3', '2');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('5', '新增账号', '/admin/user/add', '4', '4');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('6', '账号修改', '/admin/user/update', '4', '4');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('7', '删除账号', '/admin/user/delete', '4', '4');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('4', '账号列表', '/admin/users/list', '3', '2');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('5', '新增账号', '/admin/users/add', '4', '4');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('6', '账号修改', '/admin/users/update', '4', '4');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('7', '删除账号', '/admin/users/delete', '4', '4');
+/* 操作日志关联操作 */
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('8', '操作日志列表', '/admin/operations/list', '3', '3');
+/* 用户权限列表操作 */
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `auth`)           VALUES ('9', '后台用户权限列表', '/admin/user/access', '2', '1', '0');
+
 
 /* 
  * 后台用户表

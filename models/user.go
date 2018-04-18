@@ -232,3 +232,15 @@ func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, de
 
 	return ret, count, err
 }
+
+// AddUser handles add admin user to database request
+// @param user is admin user information
+// @return nil if successful; otherwise return an error
+func AddUser(u *proto.NewUser) error {
+	return nil
+}
+
+// addUser adds db user record and related access
+func addUser(session *xorm.Session, user *proto.NewUser) error {
+	return nil
+}
