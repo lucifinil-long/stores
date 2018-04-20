@@ -108,3 +108,66 @@ func getSubTreeNodes(session *xorm.Session, pid int, menu bool, accessIds ...int
 
 	return records, err
 }
+
+// GetAccessTree get tree nodes for specified parent id
+// @param pid is the id of parent node id
+// @param menu is the flag of tree menu
+// @return ([]*proto.AccessTreeNode or nil, nil) if successful; otherwise return (nil, error)
+func GetAccessTree(pid int) ([]*proto.AccessTreeNode, error) {
+	return getAccessTree(nil, pid)
+}
+
+// getAccessTree get tree nodes for specified parent id
+// @param session is the database session, can be nil; if nil will use default database session
+// @param pid is the id of parent node id
+// @param menu is the flag of tree menu
+// @return ([]*proto.AccessTreeNode or nil, nil) if successful; otherwise return (nil, error)
+func getAccessTree(session *xorm.Session, pid int) ([]*proto.AccessTreeNode, error) {
+	if session == nil {
+		session = config.GetConfigs().OrmEngine.NewSession()
+		defer session.Close()
+	}
+
+	records, err := getSubTreeNodes(session, pid, false)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(records) == 0 {
+		return []*proto.AccessTreeNode{}, nil
+	}
+
+	ret := make([]*proto.AccessTreeNode, 0, len(records))
+	for _, record := range records {
+		node := storesNode2Protocl(record)
+		if node == nil {
+			log.Error("models.getAccessTree: session.Find get nil data")
+			continue
+		}
+		node.Children, err = getAccessTree(session, record.Id)
+		if err != nil {
+			return nil, err
+		}
+
+		ret = append(ret, node)
+	}
+
+	return ret, nil
+}
+
+func storesNode2Protocl(record *db.StoresNode) *proto.AccessTreeNode {
+	if record == nil {
+		return nil
+	}
+	return &proto.AccessTreeNode{
+		ID:       record.Id,
+		Title:    record.Title,
+		Path:     record.Path,
+		Level:    record.Level,
+		Pid:      record.Pid,
+		Auth:     record.Auth,
+		Icon:     record.Icon,
+		Remark:   record.Remark,
+		Children: []*proto.AccessTreeNode{},
+	}
+}

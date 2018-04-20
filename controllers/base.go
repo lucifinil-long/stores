@@ -187,7 +187,7 @@ func CheckLogin(username, password string) (*proto.User, error) {
 	userDBPwd := strings.ToLower(user.Password)
 
 	if userDBPwd != password && userDBPwd != passwordMd5 {
-		return nil, models.ErrUserWrongPwd
+		return nil, proto.ErrUserWrongPwd
 	}
 
 	return user, nil

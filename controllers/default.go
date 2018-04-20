@@ -169,3 +169,23 @@ func (mc *MainController) ChangePassword() {
 		Protocol:    "",
 	})
 }
+
+// AccessList handles access list request
+func (mc *MainController) AccessList() {
+	nodes, err := models.GetAccessTree(0)
+	if err != nil {
+		log.Error("MainController.AccessList: models.GetAccessTree returned error: %v", err)
+		mc.Response(&proto.Response{
+			Status:      proto.ReturnStatusFailed,
+			Description: proto.ErrCommonInternalError.Error(),
+			Protocol:    "",
+		})
+		return
+	}
+
+	mc.Response(&proto.Response{
+		Status:      proto.ReturnStatusSuccess,
+		Description: cRspSuccess,
+		Protocol:    nodes,
+	})
+}

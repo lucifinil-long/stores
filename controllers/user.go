@@ -56,7 +56,7 @@ func (uc *UserController) AddUser() {
 	currentUser := uc.CurrentUser()
 	if currentUser == nil {
 		rsp.Status = proto.ReturnStatusNeedLogin
-		rsp.Description = ErrReloginNeed.Error()
+		rsp.Description = proto.ErrReloginNeed.Error()
 		uc.Response(rsp)
 		return
 	}
@@ -72,13 +72,30 @@ func (uc *UserController) AddUser() {
 		"Remark":   "备注",
 		"Password": "密码",
 	}
+	field, err := utils.CheckDataValid(user)
+	if err != nil {
+		rsp.Description = utils.AddErrorPrefix(err, colMap[field]).Error()
+		uc.Response(rsp)
+		return
+	}
 
-	err := models.AddUser(user)
+	if len(user.Username) == 0 {
+		rsp.Description = proto.ErrCommonInvalidParam.Error()
+		uc.Response(rsp)
+		return
+	}
+	if len(user.Password) < 5 {
+		rsp.Description = proto.ErrNotEnoughPasswordStrength.Error()
+		uc.Response(rsp)
+		return
+	}
+
+	err = models.AddUser(user)
 	if err != nil {
 		log.Error("UserController.AddUser: models.AddUser returned '%v'", err)
 		uc.OperationLog(cActionAddUser, cAddUserFailed, fmt.Sprintf(cErrorFormat, err))
 		err = models.FormatMysqlError(err)
-		if err == models.ErrDupKey {
+		if err == proto.ErrDupKey {
 			err = utils.AddErrorPrefix(err, colMap["Username"]+"'"+user.Username+"'")
 		}
 		rsp.Description = err.Error()
@@ -89,4 +106,69 @@ func (uc *UserController) AddUser() {
 	}
 
 	uc.Response(rsp)
+}
+
+// DeleteUser handles delete user request
+func (uc *UserController) DeleteUser() {
+	rsp := &proto.Response{
+		Status:   proto.ReturnStatusFailed,
+		Protocol: &proto.DeleteUserRes{},
+	}
+
+	// we should always check login authority for admin system operation even config allows anonymity login
+	currentUser := uc.CurrentUser()
+	if currentUser == nil {
+		rsp.Status = proto.ReturnStatusNeedLogin
+		rsp.Description = proto.ErrReloginNeed.Error()
+		uc.Response(rsp)
+		return
+	}
+
+	uid, _ := uc.GetInt(cUserID, 0)
+
+	if currentUser.ID == uid {
+		rsp.Description = proto.ErrCanNotDeleteSelf.Error()
+		uc.Response(rsp)
+		return
+	}
+
+	user, err := models.GetUser(uid)
+	if err != nil && err != proto.ErrUserNotExist {
+		rsp.Description = proto.ErrCommonInternalError.Error()
+		uc.Response(rsp)
+		log.Error("UserController.DeleteUser: models.GetUser returned '%v'", err)
+		uc.OperationLog(cActionDeleteUser, cDeleteUserFailed, fmt.Sprintf(cErrorFormat, err))
+		return
+	} else if err == proto.ErrUserNotExist {
+		rsp.Status = proto.ReturnStatusSuccess
+		rsp.Description = cRspSuccess
+		uc.Response(rsp)
+		uc.OperationLog(cActionDeleteUser, cDeleteUserFailed, fmt.Sprintf(cErrorFormat, err))
+		return
+	}
+
+	if currentUser.Level > user.Level {
+		rsp.Description = proto.ErrCanNotUpdateHighLevelUser.Error()
+		uc.Response(rsp)
+		return
+	}
+
+	if err = models.DeleteUser(uid); err != nil {
+		rsp.Description = proto.ErrCommonInternalError.Error()
+		uc.Response(rsp)
+		log.Error("UserController.DeleteUser: models.DeleteUser returned '%v'", err)
+		uc.OperationLog(cActionDeleteUser, cDeleteUserFailed, fmt.Sprintf(cErrorFormat, err))
+		return
+	}
+
+	rsp.Status = proto.ReturnStatusSuccess
+	rsp.Description = cRspSuccess
+	uc.Response(rsp)
+
+	uc.OperationLog(cActionDeleteUser, cDeleteUserSuccess,
+		fmt.Sprintf(
+			cUserInfoFormat,
+			user.Id,
+			user.Username,
+		))
 }

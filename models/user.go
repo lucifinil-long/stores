@@ -71,6 +71,66 @@ func protoNewUser2DBUser(user *proto.NewUser) *db.StoresUser {
 	}
 }
 
+// assignAccessToUser assign accesses to user
+func assignAccessToUser(session *xorm.Session, uid int, accesses []int) error {
+	records := []db.StoresUserNode{}
+	err := session.Table(cTableStoresUserNode).Where("user_id=?", uid).Find(&records)
+	sql, params := session.LastSQL()
+	log.Trace("models.assignAccessToUser: query sql: `%v`, parameters: %v", sql, params)
+	if err != nil {
+		return err
+	}
+
+	// check whether need to update access
+	if len(accesses) == len(records) {
+		same := true
+		for _, record := range records {
+			found := false
+			for _, id := range accesses {
+				if id == record.NodeId {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				same = false
+				break
+			}
+		}
+
+		if same {
+			log.Trace("models.assignAccessToUser returned for user access is not changed.")
+			return nil
+		}
+	}
+
+	// remove current access of user before assign new accesses
+	if err = removeAccessOfUser(session, uid); err != nil {
+		return err
+	}
+
+	inserts := make([]db.StoresUserNode, 0, len(accesses))
+	for _, val := range accesses {
+		record := db.StoresUserNode{UserId: uid, NodeId: val}
+		inserts = append(inserts, record)
+	}
+	_, err = session.Table(cTableStoresUserNode).InsertMulti(inserts)
+	sql, params = session.LastSQL()
+	log.Trace("models.assignAccessToUser: sql: `%v`, parameters: %v", sql, params)
+
+	return err
+}
+
+// removeAccessOfUser remove accesses of user
+func removeAccessOfUser(session *xorm.Session, uid int) error {
+	_, err := session.Table(cTableStoresUserNode).Where("user_id=?", uid).Delete(db.StoresUserNode{})
+	sql, params := session.LastSQL()
+	log.Trace("models.removeAccessOfUser: sql: `%v`, parameters: %v, error: %v", sql, params, err)
+
+	return err
+}
+
 // IsSuperAdmin test whether user is super administrator role
 func IsSuperAdmin(user *proto.User) bool {
 	return user != nil && user.Level == -1
@@ -123,7 +183,7 @@ func getUserAccessList(session *xorm.Session, uid int, onlyAuthNode bool) ([]*db
 	err := session.Find(&records)
 
 	sql, params := session.LastSQL()
-	log.Trace("models.GetUserAccessList: query sql: `%v`, parameters: %v", sql, params)
+	log.Trace("models.GetUserAccessList: sql: `%v`, parameters: %v", sql, params)
 
 	return records, err
 }
@@ -153,18 +213,18 @@ func getUserInfoByUsername(session *xorm.Session, username string) (*db.StoresUs
 	found, err := session.Where("username=?", username).Get(user)
 
 	sql, params := session.LastSQL()
-	log.Trace("models.checkUserInfo: query sql: `%v`, parameters: %v", sql, params)
+	log.Trace("models.checkUserInfo: sql: `%v`, parameters: %v", sql, params)
 
 	if err != nil {
 		return nil, err
 	}
 
 	if !found || user.Id == 0 {
-		return nil, ErrUserNotExist
+		return nil, proto.ErrUserNotExist
 	}
 
 	if user.Status == 0 {
-		return nil, ErrUserDisabled
+		return nil, proto.ErrUserDisabled
 	}
 
 	return user, nil
@@ -258,7 +318,7 @@ func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, de
 
 	err := session.Find(&records)
 	sql, params := session.LastSQL()
-	log.Trace("models.getUserList: query sql: `%v`, parameters: %v", sql, params)
+	log.Trace("models.getUserList: sql: `%v`, parameters: %v", sql, params)
 
 	if err != nil {
 		return []proto.User{}, 0, err
@@ -312,10 +372,10 @@ func addUser(session *xorm.Session, user *proto.NewUser) error {
 
 	if dbUser.Id <= 0 {
 		log.Error("models.addUser: user id (%v) is invalid after add user to database.", dbUser.Id)
-		return ErrCommonInternalError
+		return proto.ErrCommonInternalError
 	}
 
-	return nil
+	return assignAccessToUser(session, dbUser.Id, user.Accesses)
 }
 
 // addDBUser handles add user to database request
@@ -323,7 +383,7 @@ func addUser(session *xorm.Session, user *proto.NewUser) error {
 // @param user is db user information
 func addDBUser(session *xorm.Session, user *db.StoresUser) error {
 	if len(user.Username) == 0 {
-		return ErrCommonInvalidParam
+		return proto.ErrCommonInvalidParam
 	}
 
 	_, err := session.Insert(user)
@@ -331,4 +391,75 @@ func addDBUser(session *xorm.Session, user *db.StoresUser) error {
 	log.Trace("models.addDBUser: query sql: `%v`, parameters: %v", sql, params)
 
 	return err
+}
+
+// DeleteUser delete specified user
+// @param uid is the user id in database
+// @return nil if successful; otherwise return an error
+func DeleteUser(uid int) error {
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+
+	var err error
+	if err = session.Begin(); err != nil {
+		return err
+	}
+
+	err = deleteUser(session, uid)
+	if err != nil {
+		if rollbackErr := session.Rollback(); rollbackErr != nil {
+			log.Error("models.AddUser: rollback failed with %v", rollbackErr)
+		}
+		return err
+	}
+
+	return session.Commit()
+}
+
+// deleteUser delete specified user from user table and
+// @param session is the database session, can be nil; if nil will use default database session
+// @param uid is the user id in database
+// @return nil if successful; otherwise return an error
+func deleteUser(session *xorm.Session, uid int) error {
+	err := deleteDBUser(session, uid)
+	if err != nil {
+		return err
+	}
+
+	return removeAccessOfUser(session, uid)
+}
+
+// deleteDBUser delete specified user from user table
+// @param session is the database session, can be nil; if nil will use default database session
+// @param uid is the user id in database
+// @return nil if successful; otherwise return an error
+func deleteDBUser(session *xorm.Session, uid int) error {
+	user := &db.StoresUser{Id: uid}
+	_, err := session.Table(user).Where("id=?", uid).Delete(user)
+	return err
+}
+
+// GetUser get an user information from database
+// @param uid is the user id in database
+// @param columns is user database columns name to be queried
+// @return (*db.StoresUser, nil) if successful; otherwise return (nil, error)
+func GetUser(uid int, columns ...string) (*db.StoresUser, error) {
+
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+
+	user := &db.StoresUser{Id: uid}
+	session.Table(user).Where("id=?", uid)
+	if len(columns) > 0 {
+		session.Cols(columns...)
+	}
+	found, err := session.Get(user)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, proto.ErrUserNotExist
+	}
+
+	return user, nil
 }

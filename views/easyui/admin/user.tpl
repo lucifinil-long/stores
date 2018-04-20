@@ -207,13 +207,13 @@ function onBtnAdd() {
     }
 
     var info = {
-        username: $("#unTextBox").val(),
-        password: hex_md5($("#pwdTextBox").val()),
-        nickname: $("#nickTextBox").val(),
-        mobile:    $("#mobileTextBox").val(),
-        remark:   $("#remarkTextArea").val(),
-        status:   status,
-        access:   userAccessList
+        username:   $("#unTextBox").val(),
+        password:   hex_md5($("#pwdTextBox").val()),
+        nickname:   $("#nickTextBox").val(),
+        mobile:     $("#mobileTextBox").val(),
+        remark:     $("#remarkTextArea").val(),
+        status:     status,
+        accesses:   userAccessList
     }
 
     var data = new Object();
@@ -264,14 +264,14 @@ function onBtnUpdate() {
     }
 
     var info = {
-        id:       editDataRow.id,
-        username: $("#unTextBox").val(),
-        password: pwd,
-        nickname: $("#nickTextBox").val(),
-        mobile:    $("#mobileTextBox").val(),
-        remark:   $("#remarkTextArea").val(),
-        status:   status,
-        access:   userAccessList
+        id:         editDataRow.id,
+        username:   $("#unTextBox").val(),
+        password:   pwd,
+        nickname:   $("#nickTextBox").val(),
+        mobile:     $("#mobileTextBox").val(),
+        remark:     $("#remarkTextArea").val(),
+        status:     status,
+        accesses:   userAccessList
     }
 
     var data = new Object();
@@ -318,7 +318,7 @@ function onUserDlgOpen() {
             type: "get",
             dataType: "json",
             data: {uid: 0}, 
-            url: URL + '/access',
+            url: URL + '/accesses',
             success: function (rsp) {
                 if(rsp.status == 1){
                     userAccessList = rsp.protocol.list;
@@ -344,7 +344,7 @@ function onUserDlgOpen() {
             type: "get",
             dataType: "json",
             data: {uid: editDataRow.id}, 
-            url: URL + '/access',
+            url: URL + '/accesses',
             success: function (rsp) {
                 if(rsp.status == 1){
                     userAccessList = rsp.protocol.list;
@@ -488,7 +488,7 @@ function delRow(){
                 </tr>
                 <tr>
                     <td>手机：</td>
-                    <td><input id="mobileTextBox" class="easyui-validatebox" validType="mobile"  /></td>
+                    <td><input id="mobileTextBox" class="easyui-validatebox" validType="mobile" required="true" /></td>
                 </tr>
                 <tr>
                     <td>状态：</td>

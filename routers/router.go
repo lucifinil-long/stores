@@ -23,8 +23,10 @@ func init() {
 	beego.Router("/public/login", &controllers.MainController{}, "*:Login")
 	beego.Router("/public/logout", &controllers.MainController{}, "*:Logout")
 	beego.Router("/public/changepwd", &controllers.MainController{}, "*:ChangePassword")
+	beego.Router("/public/accesslist", &controllers.MainController{}, "*:AccessList")
 
 	// system user related
 	beego.Router("/admin/user/list", &controllers.UserController{}, "*:UserList")
 	beego.Router("/admin/user/add", &controllers.UserController{}, "*:AddUser")
+	beego.Router("/admin/user/delete", &controllers.UserController{}, "*:DeleteUser")
 }

@@ -247,13 +247,13 @@ type UserListRes struct {
 
 // NewUser is new user entry
 type NewUser struct {
-	Username string `json:"username"` // ��������登录名，必填项
+	Username string `json:"username"` // 用户登录名，必填项
 	Nickname string `json:"nickname"` // 用户昵称
 	Password string `json:"password"` // 用户密码
 	Mobile   string `json:"mobile"`   // 用户手机
 	Remark   string `json:"remark"`   // 备注
 	Status   int    `json:"status"`   // 用户状态，0为禁用，1为启用
-	Access   []int  `json:"access"`   // 用户权限ID列表
+	Accesses []int  `json:"accesses"` // 用户权限ID列表
 }
 
 // AddUserReq 提交添加一个新用户的请求

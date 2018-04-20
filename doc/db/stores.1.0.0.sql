@@ -72,10 +72,8 @@ INSERT INTO `stores_user` (`username`,`password`,`nickname`,`level`, `created_ti
  * 用户授权访问信息
  */
 CREATE TABLE `stores_user_node` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT '用户ID',
   `node_id` int(11) NOT NULL COMMENT '授权访问节点ID',
-  PRIMARY KEY (`id`),
   KEY `idx_nid` (`node_id`),
   KEY `idx_uid` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
