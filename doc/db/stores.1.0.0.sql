@@ -47,7 +47,6 @@ INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)               
 /* 用户权限列表操作 */
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `auth`)           VALUES ('9', '后台用户权限列表', '/admin/user/access', '2', '1', '0');
 
-
 /* 
  * 后台用户表
  */
@@ -56,27 +55,17 @@ CREATE TABLE `stores_user` (
   `username` varchar(128) NOT NULL DEFAULT '' COMMENT '用户登录名',
   `password` varchar(64) NOT NULL DEFAULT '' COMMENT '用户密码',
   `nickname` varchar(128) NOT NULL DEFAULT '' COMMENT '用户昵称',
-  `mobile` varchar(128) DEFAULT '' COMMENT '用户手机',
+  `mobile` varchar(24) DEFAULT '' COMMENT '用户手机',
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '用户状态，0为禁用，1为启用',
-  `level` tinyint(4) NOT NULL DEFAULT '1' COMMENT '用户级别，-1为超级管理员，1为普通管理员',
+  `level` tinyint(4) NOT NULL DEFAULT '0' COMMENT '用户消费累计等级',
   `last_login_time` datetime DEFAULT NULL,
   `created_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_un` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /* insert super administrator with password @dminPwd */
-INSERT INTO `stores_user` (`username`,`password`,`nickname`,`level`, `created_time`) VALUES ('admin', '5106e9dd4f30c7a042569a4e3d42b4a4', 'super administrator', '-1', NOW());
-
-/* 
- * 用户授权访问信息
- */
-CREATE TABLE `stores_user_node` (
-  `user_id` int(11) NOT NULL COMMENT '用户ID',
-  `node_id` int(11) NOT NULL COMMENT '授权访问节点ID',
-  KEY `idx_nid` (`node_id`),
-  KEY `idx_uid` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `stores_user` (`username`,`password`,`nickname`, `mobile`, `created_time`) VALUES ('admin', '5106e9dd4f30c7a042569a4e3d42b4a4', 'super administrator', '13888888888', NOW());
 
 /* 
  * 后台操作日志表
@@ -91,4 +80,44 @@ CREATE TABLE `stores_op_log` (
   `created_time` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* 
+ * 用户角色授权访问信息
+ */
+CREATE TABLE `stores_roles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_name` varchar(128) NOT NULL COMMENT '角色类型',
+  `remark` varchar(512) DEFAULT NULL COMMENT '备注',
+  `deletable` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否可删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `stores_roles` (`role_name`, `remark`, `deletable`) VALUES ('超级管理员', '后台超级管理员', 0);
+INSERT INTO `stores_roles` (`role_name`, `remark`) VALUES ('管理员', '后台管理员');
+INSERT INTO `stores_roles` (`role_name`, `remark`) VALUES ('库管', '库管员工');
+INSERT INTO `stores_roles` (`role_name`, `remark`) VALUES ('销售', '销售员工');
+
+/* 
+ * 用户角色授权访问信息
+ */
+CREATE TABLE `stores_role_nodes` (
+  `role_id` int(11) NOT NULL COMMENT '用户角色类型ID',
+  `node_id` int(11) NOT NULL COMMENT '授权访问节点ID',
+  PRIMARY KEY (`role_id`, `node_id`),
+  FOREIGN KEY (`role_id`) REFERENCES stores_roles(`id`),
+  FOREIGN KEY (`node_id`) REFERENCES stores_node(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+/* 
+ * 用户角色授权访问信息
+ */
+CREATE TABLE `stores_role_users` (
+  `role_id` int(11) NOT NULL COMMENT '用户角色类型ID',
+  `user_id` int(11) NOT NULL COMMENT '用户ID',
+  PRIMARY KEY (`role_id`, `user_id`),
+  FOREIGN KEY (`role_id`) REFERENCES stores_roles(`id`),
+  FOREIGN KEY (`user_id`) REFERENCES stores_user(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+INSERT INTO `stores_role_users` (`role_id`, `user_id`) VALUES (1, 1);
+
+
 
