@@ -1,11 +1,9 @@
-package db
-
 // generated automatically when refresh database models
 // don't modify the code manually, changes might be lost
 
-/*
- *	StoresNode is a database model struct
- */
+package db
+
+// StoresNode is a database model struct
 type StoresNode struct {
 	Id     int    `json:"id" xorm:"not null pk autoincr INT(11)"`
 	Title  string `json:"title" xorm:"not null default '' VARCHAR(100)"`

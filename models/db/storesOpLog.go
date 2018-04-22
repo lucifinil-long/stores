@@ -1,15 +1,13 @@
-package db
-
 // generated automatically when refresh database models
 // don't modify the code manually, changes might be lost
+
+package db
 
 import (
 	"time"
 )
 
-/*
- *	StoresOpLog is a database model struct
- */
+// StoresOpLog is a database model struct
 type StoresOpLog struct {
 	Id          int64     `json:"id" xorm:"pk autoincr BIGINT(20)"`
 	UserId      int       `json:"user_id" xorm:"not null INT(11)"`

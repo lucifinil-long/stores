@@ -32,10 +32,10 @@ prefix=cos_
 EOF
 
 cat > $TmplDir/struct.go.tpl <<EOF
-package {{.Model}}
-
 // generated automatically when refresh database models
 // don't modify the code manually, changes might be lost
+
+package {{.Model}}
 
 {{\$ilen := len .Imports}}
 {{if gt \$ilen 0}}
@@ -45,9 +45,7 @@ import (
 {{end}}
 
 {{range .Tables}}
-/*
- *	{{Mapper .Name}} is a database model struct
- */
+// {{Mapper .Name}} is a database model struct
 type {{Mapper .Name}} struct {
 {{\$table := .}}
 {{range .ColumnsSeq}}{{\$col := \$table.GetColumn .}}	{{Mapper \$col.Name}}	{{Type \$col}} {{Tag \$table \$col}}
