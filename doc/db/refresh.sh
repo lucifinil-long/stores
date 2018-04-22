@@ -45,7 +45,7 @@ import (
 {{end}}
 
 {{range .Tables}}
-// {{Mapper .Name}} is a database model struct
+// {{Mapper .Name}} is the database model struct
 type {{Mapper .Name}} struct {
 {{\$table := .}}
 {{range .ColumnsSeq}}{{\$col := \$table.GetColumn .}}	{{Mapper \$col.Name}}	{{Type \$col}} {{Tag \$table \$col}}

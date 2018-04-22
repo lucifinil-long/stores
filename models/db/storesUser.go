@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// StoresUser is a database model struct
+// StoresUser is the database model struct
 type StoresUser struct {
 	Id            int       `json:"id" xorm:"not null pk autoincr INT(11)"`
 	Username      string    `json:"username" xorm:"not null default '' unique VARCHAR(128)"`

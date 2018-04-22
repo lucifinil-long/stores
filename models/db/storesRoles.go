@@ -3,7 +3,7 @@
 
 package db
 
-// StoresRoles is a database model struct
+// StoresRoles is the database model struct
 type StoresRoles struct {
 	Id        int    `json:"id" xorm:"not null pk autoincr INT(11)"`
 	RoleName  string `json:"role_name" xorm:"not null VARCHAR(128)"`
