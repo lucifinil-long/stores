@@ -17,7 +17,7 @@ const (
 	cJSONKey  = "json"
 	cUserInfo = "userinfo"
 
-	cUsername      = "username"
+	cUID           = "uid"
 	cPassword      = "password"
 	cOld           = "old"
 	cNew           = "new"
@@ -70,5 +70,5 @@ const (
 
 const (
 	cErrorFormat    = "错误：%v"
-	cUserInfoFormat = "用户ID：%v 用户名： %v"
+	cUserInfoFormat = "用户ID：%v 手机： %v"
 )

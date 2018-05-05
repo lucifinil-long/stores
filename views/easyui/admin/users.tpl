@@ -1,10 +1,6 @@
 {{template "../public/header.tpl"}}
 <script type="text/javascript" src="/static/js/md5.js"></script>
 <script type="text/javascript">
-var statuslist = [
-    {statusid:'0',name:'禁用'},
-    {statusid:'1',name:'启用'}
-];
 var URL="/admin/user";
 
 $.extend($.fn.validatebox.defaults.rules, {  
@@ -36,27 +32,10 @@ $(function(){
         pageList:[10,20,30,50,100],
         columns:[[
             {field:'id',title:'ID',width:50,sortable:true},
-            {field:'username',title:'用户名',width:100,sortable:true},
-            {field:'nickname',title:'昵称',width:100,align:'center',editor:'text'},
-            {field:'mobile',title:'手机',width:100,align:'center',editor:'text'},
-            {field:'remark',title:'备注',width:150,align:'center',editor:'text'},
-            {field:'status',title:'状态',width:50,align:'center',
-                formatter:function(value){
-                    for(var i=0; i<statuslist.length; i++){
-                        if (statuslist[i].statusid == value) return statuslist[i].name;
-                    }
-                    return value;
-                },
-                editor:{
-                    type:'combobox',
-                    options:{
-                        valueField:'statusid',
-                        textField:'name',
-                        data:statuslist,
-                        required:true
-                    }
-                }
-            },
+            {field:'nickname',title:'用户名',width:100,align:'center'},
+            {field:'mobile',title:'手机',width:100,align:'center'},
+            {field:'role',title:'角色组',width:100,align:'center'},
+            {field:'remark',title:'备注',width:150,align:'center'},
             {field:'last_login_time',title:'上次登录时间',width:100,align:'center',
                 formatter:function(value,row,index){
                     if(value) return phpjs.date("Y-m-d H:i:s",phpjs.strtotime(value));
@@ -107,86 +86,6 @@ $(function(){
         }],
         onOpen: onUserDlgOpen
     });
-
-    userAccessList = new Array();
-    $('#authtree').treegrid({
-        idField:'id',
-        treeField:'title',
-        fitColumns:true,
-        singleSelect:false,
-        columns:[[
-            {title:'标题',field:'title', width:300},
-            {title:'是否需要授权访问',field:'auth', width:150,
-                formatter:function(value) {
-                if (value == 0) { return "无需授权";}
-                if (value == 1) { return "授权访问";}
-                return value;
-            }
-        }
-        ]],
-        loader:function(param,success,error){
-            $.ajax({
-                type: "get",
-                data: param,
-                url: "/public/accesslist",
-                success: function (data) {
-                    if(data.status == 1){
-                        success(data.protocol);
-                    } else if (data.status == 307 || data.status == 302) {
-                        parent.document.location = data.protocol
-                    } else {
-                        error(data.info);
-                    }
-                },
-                error: function (data) {
-                    var tip = JSON.stringfy(data);
-                    error(tip);
-                }
-            });
-            return true
-        },
-        onSelect:function(row) {
-            $(this).treegrid('expandAll',row.id);
-            if(row._parentId != undefined && row._parentId != 0){
-                $(this).treegrid('select',row._parentId);
-            }
-        },
-        onUnselect:function(row) {
-            if(row.children != undefined){
-                for(var i=0;i<row.children.length;i++){
-                    $(this).treegrid('unselect',row.children[i].id);
-                }
-            }
-        }
-    });
-
-    //创建设置权限窗口
-    $("#authDlg").dialog({
-        modal:true,
-        resizable:true,
-        top:150,
-        closed:true,
-        buttons:[{
-            text:'设置',
-            iconCls:'icon-save',
-            handler:function(){
-                var tdata = $("#authtree").treegrid('getSelections');
-                userAccessList = new Array(tdata.length);
-                for(var i=0;i<tdata.length;i++){
-                    userAccessList[i] = tdata[i].id;
-                }
-                $("#authDlg").dialog("close");
-            }
-        },
-        {
-            text:'关闭',
-            iconCls:'icon-cancel',
-            handler:function(){
-                $("#authDlg").dialog("close");
-            }
-        }],
-        onOpen: onAuthDlgOpen
-    });
 })
 
 function onBtnAdd() {
@@ -207,13 +106,10 @@ function onBtnAdd() {
     }
 
     var info = {
-        username:   $("#unTextBox").val(),
         password:   hex_md5($("#pwdTextBox").val()),
         nickname:   $("#nickTextBox").val(),
-        mobile:     $("#mobileTextBox").val(),
+        mobile:     Number($("#mobileTextBox").val()),
         remark:     $("#remarkTextArea").val(),
-        status:     status,
-        accesses:   userAccessList
     }
 
     var data = new Object();
@@ -265,13 +161,10 @@ function onBtnUpdate() {
 
     var info = {
         id:         editDataRow.id,
-        username:   $("#unTextBox").val(),
         password:   pwd,
         nickname:   $("#nickTextBox").val(),
         mobile:     $("#mobileTextBox").val(),
-        remark:     $("#remarkTextArea").val(),
-        status:     status,
-        accesses:   userAccessList
+        remark:     $("#remarkTextArea").val()
     }
 
     var data = new Object();
@@ -302,59 +195,21 @@ function onBtnUpdate() {
 function onUserDlgOpen() {
     $("#userForm").form('clear');
 
-    userAccessList = new Array();
-
     // 根据新建还是修改设置正确的按钮显示
     if (addNewUser) {
         $("#btnAdd").show();
         $("#btnUpdate").hide();//隐藏更新按钮
         $("#btnModifyPwd").hide();
-        $("#unTextBox").prop('readonly', false);
-        $("#statusCheckBox").prop("checked", true);
         $("#pwdTextBox").prop('readonly', false);
         $("#repeatTextBox").prop('readonly', false);
-
-        $.ajax({
-            type: "get",
-            dataType: "json",
-            data: {uid: 0}, 
-            url: URL + '/accesses',
-            success: function (rsp) {
-                if(rsp.status == 1){
-                    userAccessList = rsp.protocol.list;
-                } else if (rsp.status == 307 || rsp.status == 302) {
-                    parent.document.location = rsp.protocol
-                } else {
-                    vac.alert(rsp.info);
-                }
-            }
-        });
-
     } else {
         $("#btnAdd").hide();//隐藏添加按钮
         $("#btnUpdate").show();
         $("#btnModifyPwd").show();
-        $("#unTextBox").prop('readonly', true);
         $("#pwdTextBox").prop('readonly', true);
         $("#repeatTextBox").prop('readonly', true);
 
         setEditData2Dlg();
-
-        $.ajax({
-            type: "get",
-            dataType: "json",
-            data: {uid: editDataRow.id}, 
-            url: URL + '/accesses',
-            success: function (rsp) {
-                if(rsp.status == 1){
-                    userAccessList = rsp.protocol.list;
-                } else if (rsp.status == 307 || rsp.status == 302) {
-                    parent.document.location = rsp.protocol
-                } else {
-                    vac.alert(rsp.info);
-                }
-            }
-        });
     }
 }
 
@@ -363,19 +218,6 @@ function onBtnModifyPwd() {
     $("#repeatTextBox").val("");
     $("#pwdTextBox").prop('readonly', false);
     $("#repeatTextBox").prop('readonly', false);
-}
-
-function onAuthDlgOpen() {
-    var tg = $('#authtree')
-    tg.treegrid('unselectAll');
-    selectTreeGridItems(tg, userAccessList)
-}
-
-function selectTreeGridItems(tg, data) {
-     //选中已存在的对应关系
-    for(var i=0;i<data.length;i++){
-        tg.treegrid('select', data[i]);
-    }
 }
 
 function onUnselectRow(row) {
@@ -405,13 +247,9 @@ function setEditData2Dlg() {
         return;
     }
 
-    $("#unTextBox").val(editDataRow.username);
     $("#nickTextBox").val(editDataRow.nickname);
     $("#mobileTextBox").val(editDataRow.mobile);
     $("#remarkTextArea").val(editDataRow.remark);
-    if (editDataRow.status == 1) {
-        $("#statusCheckBox").prop("checked", true);
-    }
 
     $("#pwdTextBox").val("12345");
     $("#repeatTextBox").val("12345");
@@ -470,11 +308,11 @@ function delRow(){
         <form id="userForm">
             <table>
                 <tr>
-                    <td>用户名：</td>
-                    <td><input id="unTextBox" class="easyui-validatebox" required="true"/></td>
+                    <td>手机：</td>
+                    <td><input id="mobileTextBox" class="easyui-validatebox" validType="mobile" required="true" /></td>
                 </tr>
                 <tr>
-                    <td>昵称：</td>
+                    <td>用户名：</td>
                     <td><input id="nickTextBox" class="easyui-validatebox" required="true"  /></td>
                 </tr>
                 <tr>
@@ -485,18 +323,6 @@ function delRow(){
                 <tr>
                     <td>重复密码：</td>
                     <td><input id="repeatTextBox" type="password" class="easyui-validatebox" required="true" validType="equalTo['#pwdTextBox']" missingMessage="请重复填写密码" invalidMessage="两次输入密码不匹配" /></td>
-                </tr>
-                <tr>
-                    <td>手机：</td>
-                    <td><input id="mobileTextBox" class="easyui-validatebox" validType="mobile" required="true" /></td>
-                </tr>
-                <tr>
-                    <td>状态：</td>
-                    <td>启用<input id="statusCheckBox" type="checkbox" value=1/></td>
-                </tr>
-                <tr>
-                    <td>权限列表：</td>
-                    <td><a id="btnAuth" href="#" icon='icon-edit' plain="true" onclick="onBtnAuth()" class="easyui-linkbutton">设置</a></td>
                 </tr>
                 <tr>
                     <td>备注：</td>

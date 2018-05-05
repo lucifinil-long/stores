@@ -18,13 +18,10 @@ func dbUser2ProtoUser(user *db.StoresUser) *proto.User {
 
 	return &proto.User{
 		ID:            user.Id,
-		Username:      user.Username,
 		Nickname:      user.Nickname,
-		Password:      user.Password,
 		Mobile:        user.Mobile,
 		Remark:        user.Remark,
-		Status:        user.Status,
-		Level:         user.Level,
+		Password:      user.Password,
 		LastLoginTime: user.LastLoginTime.Format("2006-01-02T15:04:05-07:00"),
 		CreatedTime:   user.CreatedTime.Format("2006-01-02T15:04:05-07:00"),
 	}
@@ -40,13 +37,10 @@ func protoUser2DBUser(user *proto.User) *db.StoresUser {
 	cretedTime, _ := time.Parse("2006-01-02T15:04:05-07:00", user.CreatedTime)
 	return &db.StoresUser{
 		Id:            user.ID,
-		Username:      user.Username,
 		Nickname:      user.Nickname,
-		Password:      user.Password,
 		Mobile:        user.Mobile,
 		Remark:        user.Remark,
-		Status:        user.Status,
-		Level:         user.Level,
+		Password:      user.Password,
 		LastLoginTime: loginTime,
 		CreatedTime:   cretedTime,
 	}
@@ -60,12 +54,11 @@ func protoNewUser2DBUser(user *proto.NewUser) *db.StoresUser {
 
 	return &db.StoresUser{
 		Id:            0,
-		Username:      user.Username,
 		Nickname:      user.Nickname,
 		Password:      user.Password,
 		Mobile:        user.Mobile,
 		Remark:        user.Remark,
-		Status:        user.Status,
+		Deletable:     1,
 		CreatedTime:   time.Now(),
 		LastLoginTime: time.Now(),
 	}
@@ -100,7 +93,7 @@ func assignAccessToRole(session *xorm.Session, rid int, accesses []int) error {
 		}
 
 		if same {
-			log.Trace("models.assignAccessToRole returned for user access is not changed.")
+			log.Trace("models.assignAccessToRole returned for role access is not changed.")
 			return nil
 		}
 	}
@@ -117,7 +110,7 @@ func assignAccessToRole(session *xorm.Session, rid int, accesses []int) error {
 	}
 	_, err = session.Table(cTableStoresRoleNode).InsertMulti(inserts)
 	sql, params = session.LastSQL()
-	log.Trace("models.assignAccessToUser: sql: `%v`, parameters: %v", sql, params)
+	log.Trace("models.assignAccessToRole: sql: `%v`, parameters: %v", sql, params)
 
 	return err
 }
@@ -132,8 +125,8 @@ func removeAccessOfRole(session *xorm.Session, rid int) error {
 }
 
 // IsSuperAdmin test whether user is super administrator role
-func IsSuperAdmin(user *proto.User) bool {
-	return user != nil && user.Level == -1
+func IsSuperAdmin(uid int) bool {
+	return uid == -1
 }
 
 // GetUserAccessList get access permissions list
@@ -173,8 +166,13 @@ func getUserAccessList(session *xorm.Session, uid int, onlyAuthNode bool) ([]*db
 	}
 
 	records := make([]*db.StoresNode, 0)
-	session.Table(cTableStoresNode).
-		Where("id in (select node_id from stores_user_node where user_id=?)", uid)
+	session.Table(cTableStoresNode)
+
+	if IsSuperAdmin(uid) {
+		session.Where("id > 0")
+	} else {
+		session.Where("id in (select node_id from stores_role_node left join stores_role_user on stores_role_node.role_id=stores_role_user.role_id where stores_role_user.user_id=?)", uid)
+	}
 	if onlyAuthNode {
 		session.And("auth = 1")
 	} else {
@@ -188,46 +186,42 @@ func getUserAccessList(session *xorm.Session, uid int, onlyAuthNode bool) ([]*db
 	return records, err
 }
 
-// GetUserInfoByUsername validates login info
-// @param session is database xorm session
-// @param username is the username of user that be retrived information
-// @return (*proto.User, nil) if get user infomation successfuly, otherwise return (nil, error)
-func GetUserInfoByUsername(username string) (*proto.User, error) {
+// GetUserInfoByUserIDOrMobile get users for specified uid or mibile
+// @param uid is the id or mobile of user that be retrived information
+// @return ([]*proto.User, nil) if get user infomation successfully, otherwise return (nil, error)
+func GetUserInfoByUserIDOrMobile(uid int64) ([]*proto.User, error) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
-	user, err := getUserInfoByUsername(session, username)
+	users, err := getUserInfoByUserIDOrMobile(session, uid)
 	if err != nil {
 		return nil, err
 	}
 
-	return dbUser2ProtoUser(user), nil
+	ret := make([]*proto.User, 0, len(users))
+	for _, user := range users {
+		ret = append(ret, dbUser2ProtoUser(user))
+	}
+
+	return ret, nil
 }
 
-// getUserInfoByUsername validates login info
+// getUserInfoByUserIDOrMobile get users for specified uid or mibile
 // @param session is database xorm session
-// @param username is the username of user that be retrived information
-// @return (*db.StoresUser, nil) if get user infomation successfuly, otherwise return (nil, error)
-func getUserInfoByUsername(session *xorm.Session, username string) (*db.StoresUser, error) {
-	user := &db.StoresUser{}
-	found, err := session.Where("username=?", username).Get(user)
+// @param uid is the ID or mobile of user that be retrived information
+// @return ([]*db.StoresUser, nil) if get user infomation successfuly, otherwise return (nil, error)
+func getUserInfoByUserIDOrMobile(session *xorm.Session, uid int64) ([]*db.StoresUser, error) {
+	users := make([]*db.StoresUser, 0)
+	err := session.Table(cTableStoresUser).Where("(id=? or mobile=?) AND deleted=0", uid, uid).Find(&users)
 
 	sql, params := session.LastSQL()
-	log.Trace("models.checkUserInfo: sql: `%v`, parameters: %v", sql, params)
+	log.Trace("models.getUserInfoByUserIDOrMobile: sql: `%v`, parameters: %v", sql, params)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if !found || user.Id == 0 {
-		return nil, proto.ErrUserNotExist
-	}
-
-	if user.Status == 0 {
-		return nil, proto.ErrUserDisabled
-	}
-
-	return user, nil
+	return users, nil
 }
 
 // UpdateUserLoginTime updates user last login time
@@ -306,7 +300,9 @@ func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, de
 		offset = (pageIndex - 1) * pageSize
 	}
 	session.Table(cTableStoresUser).
-		Cols("id,username,nickname,mobile,remark,status,last_login_time,created_time").
+		Where("id > 0").
+		And("deleted=0").
+		Cols("id,nickname,mobile,remark,last_login_time,created_time").
 		Limit(pageSize, offset)
 	if len(sort) > 0 {
 		if desc {
@@ -324,7 +320,10 @@ func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, de
 		return []proto.User{}, 0, err
 	}
 
-	count, err := session.Table(cTableStoresUser).Count()
+	count, err := session.Table(cTableStoresUser).
+		Where("id > 0").
+		And("deleted=0").
+		Count()
 	if err != nil {
 		return []proto.User{}, 0, err
 	}
@@ -332,6 +331,10 @@ func getUserList(session *xorm.Session, pageIndex, pageSize int, sort string, de
 	ret := make([]proto.User, 0, len(records))
 	for _, record := range records {
 		user := dbUser2ProtoUser(record)
+		user.Role, err = getUserRoles(session, user.ID)
+		if err != nil {
+			log.Error("models.getUserList: getUserRoles returned error: %v", err)
+		}
 		ret = append(ret, *user)
 	}
 
@@ -375,6 +378,8 @@ func addUser(session *xorm.Session, user *proto.NewUser) error {
 		return proto.ErrCommonInternalError
 	}
 
+	user.ID = dbUser.Id
+
 	return nil
 }
 
@@ -382,7 +387,7 @@ func addUser(session *xorm.Session, user *proto.NewUser) error {
 // @param session is database session, can be nil; if nil will use default database session
 // @param user is db user information
 func addDBUser(session *xorm.Session, user *db.StoresUser) error {
-	if len(user.Username) == 0 {
+	if len(user.Nickname) == 0 {
 		return proto.ErrCommonInvalidParam
 	}
 
@@ -437,7 +442,7 @@ func deleteDBUser(session *xorm.Session, uid int) error {
 	user := &db.StoresUser{Id: uid, Deleted: 1}
 	_, err := session.Table(user).
 		Where("id=?", uid).
-		And("deleted=1").
+		And("deletable=1").
 		Cols("deleted").
 		Update(user)
 	return err
@@ -448,7 +453,6 @@ func deleteDBUser(session *xorm.Session, uid int) error {
 // @param columns is user database columns name to be queried
 // @return (*db.StoresUser, nil) if successful; otherwise return (nil, error)
 func GetUser(uid int, columns ...string) (*db.StoresUser, error) {
-
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 

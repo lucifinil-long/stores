@@ -12,24 +12,24 @@ import (
 // AddOperationLog adds a operation log entry to db
 // @param uid is the id of user that makes operation
 // @param from is the address that user is from
-// @param username is the username of user that makes operation
+// @param nickname is the nickname of user that makes operation
 // @param action is action summary
 // @param detail is action detail
-func AddOperationLog(uid int, username, from, action, detail string) {
+func AddOperationLog(uid int, nickname, from, action, detail string) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
-	addOperationLog(session, uid, username, from, action, detail)
+	addOperationLog(session, uid, nickname, from, action, detail)
 }
 
 // addOperationLog adds a operation log entry to db
 // @param session is database session, can be nil; if nil will use default database session
 // @param uid is the id of user that makes operation
 // @param from is the address that user is from
-// @param username is the username of user that makes operation
+// @param nickname is the nickname of user that makes operation
 // @param action is action summary
 // @param detail is action detail
-func addOperationLog(session *xorm.Session, uid int, username, from, action, detail string) {
+func addOperationLog(session *xorm.Session, uid int, nickname, from, action, detail string) {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()
@@ -37,7 +37,7 @@ func addOperationLog(session *xorm.Session, uid int, username, from, action, det
 
 	entry := db.StoresOpLog{
 		UserId:      uid,
-		Username:    username,
+		Nickname:    nickname,
 		From:        from,
 		Action:      action,
 		Detail:      detail,

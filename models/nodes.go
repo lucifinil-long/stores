@@ -21,7 +21,7 @@ func GetTreeMenuForUser(user *proto.User) []*proto.TreeMenuNode {
 
 	accessIds := []interface{}{}
 
-	if !IsSuperAdmin(user) {
+	if !IsSuperAdmin(user.ID) {
 		nodes, _ := getUserAccessList(session, user.ID, false)
 		for _, node := range nodes {
 			accessIds = append(accessIds, node.Id)

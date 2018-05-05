@@ -14,6 +14,7 @@ import (
 )
 
 func init() {
+	config.InitConfigs()
 	if log.GetLevel() == log.LvTRACE {
 		logReq := func(ctx *context.Context) {
 			dataBytes, _ := json.Marshal(ctx.Request.Form)
@@ -62,17 +63,17 @@ func (bc BaseController) CurrentUser() *proto.User {
 // @param details are more addtional detail
 func (bc BaseController) OperationLog(action string, details ...string) {
 	uid := 0
-	username := ""
+	nickname := ""
 	user := bc.GetSession(cSessionUserInfoKey)
 	if user != nil {
 		uid = user.(proto.User).ID
-		username = user.(proto.User).Username
+		nickname = user.(proto.User).Nickname
 	}
 
 	detail := strings.Join(details, ", ")
-	log.Info("%v(UID:%v) performed '%v' action, detail: %v", username, uid, action, detail)
+	log.Info("%v(UID:%v) performed '%v' action, detail: %v", nickname, uid, action, detail)
 
-	models.AddOperationLog(uid, username,
+	models.AddOperationLog(uid, nickname,
 		bc.Ctx.Request.RemoteAddr, action, detail)
 }
 
@@ -102,7 +103,7 @@ func AccessRegister() {
 				}
 				// super admin用户不用认证权限
 				currentUser := uinfo.(proto.User)
-				if models.IsSuperAdmin(&currentUser) {
+				if models.IsSuperAdmin(currentUser.ID) {
 					log.Trace("super administrator no need to check access list")
 					return
 				}
@@ -173,22 +174,29 @@ func AccessDecision(params []string, accesslist map[string]bool) bool {
 
 // CheckLogin validates login info
 // @param session is database xorm session
-// @param username is the username that be checked
+// @param uid is the uid which might be user ID or mobile that be checked
 // @param password is the correspond password that be checked
 // @return (*proto.User, nil) if validate user infomation successfuly, otherwise return (nil, error)
-func CheckLogin(username, password string) (*proto.User, error) {
-	user, err := models.GetUserInfoByUsername(username)
+func CheckLogin(uid int64, password string) (*proto.User, error) {
+	users, err := models.GetUserInfoByUserIDOrMobile(uid)
 	if err != nil {
 		return nil, err
 	}
 
 	passwordMd5 := strings.ToLower(utils.String2MD5(password))
 	password = strings.ToLower(password)
-	userDBPwd := strings.ToLower(user.Password)
 
-	if userDBPwd != password && userDBPwd != passwordMd5 {
-		return nil, proto.ErrUserWrongPwd
+	for _, user := range users {
+		userDBPwd := strings.ToLower(user.Password)
+
+		if userDBPwd == password || userDBPwd == passwordMd5 {
+			return user, nil
+		}
 	}
 
-	return user, nil
+	if len(users) == 0 {
+		return nil, proto.ErrUserNotExist
+	}
+
+	return nil, proto.ErrUserWrongPwd
 }

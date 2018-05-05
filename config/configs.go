@@ -45,8 +45,8 @@ const (
 )
 
 const (
-	cDefaultGateway  = "/pages/login"
-	cDefaultHomepage = "/"
+	cDefaultGateway  = "/pages/admin/login"
+	cDefaultHomepage = "/pages/admin/index"
 	cDefaultSep      = ","
 )
 
@@ -134,6 +134,8 @@ func (cfg *Configs) initOrmEngine() error {
 		if cfg.OrmEngine, err = xorm.NewEngine(dbDriver, dataSourceName); err != nil {
 			return err
 		}
+		log.Info("initOrmEngine is done successfully.")
+		log.Trace("connect string: %v", dataSourceName)
 	} else {
 		return fmt.Errorf("not supportted db driver: %v", dbDriver)
 	}
@@ -182,10 +184,10 @@ func (cfg Configs) AuthGateway() string {
 	return val
 }
 
-// Homepage get homepage path
+// AdminHomepage get homepage path
 // @return homepage path
 // Note that this might be old data if config file is changed
-func (cfg Configs) Homepage() string {
+func (cfg Configs) AdminHomepage() string {
 	val := cfg.GetConfigValue(cHomepage, false)
 	if len(val) == 0 {
 		val = cDefaultHomepage

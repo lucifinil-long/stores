@@ -219,16 +219,14 @@ type AccessListRes []AccessTreeNode
 
 // User is the admin user entry
 type User struct {
-	ID            int    `json:"id"`       // 用户ID
-	Username      string `json:"username"` // 用户登录名
-	Password      string
+	ID            int    `json:"id"`              // 用户ID
 	Nickname      string `json:"nickname"`        // 用户昵称
-	Mobile        string `json:"mobile"`          // 用户手机
+	Mobile        int64  `json:"mobile"`          // 用户手机
 	Remark        string `json:"remark"`          // 备注
-	Status        int    `json:"status"`          // 用户状态，0为禁用，1为启用
-	Level         int    `json:"level"`           // 用户消费累计等级
+	Role          string `json:"role"`            // 用户角色
 	LastLoginTime string `json:"last_login_time"` // 最后登录时间，格式为2017-12-05T15:48:31+08:00
 	CreatedTime   string `json:"created_time"`    // 创建时间，格式为2017-12-05T15:48:31+08:00
+	Password      string // 用户密码
 }
 
 // UserListReq 获取仓储管理系统用户列表数据
@@ -247,13 +245,11 @@ type UserListRes struct {
 
 // NewUser is new user entry
 type NewUser struct {
-	Username string `json:"username"` // 用户登录名，必填项
+	Mobile   int64  `json:"mobile"`   // 用户手机，必填项
 	Nickname string `json:"nickname"` // 用户昵称
 	Password string `json:"password"` // 用户密码
-	Mobile   string `json:"mobile"`   // 用户手机
 	Remark   string `json:"remark"`   // 备注
-	Status   int    `json:"status"`   // 用户状态，0为禁用，1为启用
-	Accesses []int  `json:"accesses"` // 用户权限ID列表
+	ID       int    // 用户ID
 }
 
 // AddUserReq 提交添加一个新用户的请求

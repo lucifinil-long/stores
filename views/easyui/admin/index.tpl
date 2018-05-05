@@ -4,12 +4,12 @@
     // 关闭浏览器页面的时候，发起退出登录操作
     window.onbeforeunload = function() {
         $.ajax({
-            type: "get",
-            url: "/public/logout"
+            type: "post",
+            url: "/public/admin/logout"
         });
     } 
     
-    var URL="/public"
+    var URL="/public/admin"
     $.extend($.fn.validatebox.defaults.rules, {  
         /*必须和某个字段相等*/
         equalTo: {

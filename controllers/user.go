@@ -65,12 +65,12 @@ func (uc *UserController) AddUser() {
 	user := &proto.NewUser{}
 	json.Unmarshal([]byte(insertedJSON), user)
 
+	log.Info("AddUser: new user: %v, json: [%v]", user, insertedJSON)
 	colMap := map[string]string{
-		"Username": "用户名",
-		"Nickname": "昵称",
+		"Nickname": "用户名",
 		"Mobile":   "手机",
-		"Remark":   "备注",
 		"Password": "密码",
+		"Remark":   "备注",
 	}
 	field, err := utils.CheckDataValid(user)
 	if err != nil {
@@ -79,7 +79,7 @@ func (uc *UserController) AddUser() {
 		return
 	}
 
-	if len(user.Username) == 0 {
+	if user.Mobile <= 0 {
 		rsp.Description = proto.ErrCommonInvalidParam.Error()
 		uc.Response(rsp)
 		return
@@ -96,11 +96,11 @@ func (uc *UserController) AddUser() {
 		uc.OperationLog(cActionAddUser, cAddUserFailed, fmt.Sprintf(cErrorFormat, err))
 		err = models.FormatMysqlError(err)
 		if err == proto.ErrDupKey {
-			err = utils.AddErrorPrefix(err, colMap["Username"]+"'"+user.Username+"'")
+			err = utils.AddErrorPrefix(err, colMap["Nickname"]+"'"+user.Nickname+"'")
 		}
 		rsp.Description = err.Error()
 	} else {
-		uc.OperationLog(cActionAddUser, cAddUserSuccess, fmt.Sprintf(cUserInfoFormat, 0, user.Username))
+		uc.OperationLog(cActionAddUser, cAddUserSuccess, fmt.Sprintf(cUserInfoFormat, user.ID, user.Mobile))
 		rsp.Description = cAddUserSuccess
 		rsp.Status = proto.ReturnStatusSuccess
 	}
@@ -147,11 +147,11 @@ func (uc *UserController) DeleteUser() {
 		return
 	}
 
-	if currentUser.Level > user.Level {
-		rsp.Description = proto.ErrCanNotUpdateHighLevelUser.Error()
-		uc.Response(rsp)
-		return
-	}
+	// if currentUser.Level > user.Level {
+	// 	rsp.Description = proto.ErrCanNotUpdateHighLevelUser.Error()
+	// 	uc.Response(rsp)
+	// 	return
+	// }
 
 	if err = models.DeleteUser(uid); err != nil {
 		rsp.Description = proto.ErrCommonInternalError.Error()
@@ -169,6 +169,6 @@ func (uc *UserController) DeleteUser() {
 		fmt.Sprintf(
 			cUserInfoFormat,
 			user.Id,
-			user.Username,
+			user.Nickname,
 		))
 }

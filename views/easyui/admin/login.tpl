@@ -44,14 +44,14 @@ function loginSubmit() {
     var un = $("#unTextBox").val()
 
     var info = new Object();
-    info["username"] = un;
+    info["uid"] = un;
     info["password"] = pwd;
 
     $.ajax({
         type: "post",
         dataType: "json",
         data: info,
-        url: URL + "/login",
+        url: URL + "/admin/login",
         success: function (data) {
             if (data.status == 1) {
                 location.href = data.protocol.redirect;
@@ -78,12 +78,12 @@ var SubmitOrHidden = function(evt){
 window.document.onkeydown=SubmitOrHidden;//当有键按下时执行函数
 </script>
 <body>
-<div style="text-align:center;margin:0 auto;width:350px;height:250px;" id="dialog" title="登录">
+<div style="text-align:center;margin:0 auto;width:350px;height:250px;" id="dialog" title="后台用户登录">
 <div style="padding:20px 20px 20px 40px;" >
 <form id="form" method="post">
 <table >
     <tr>
-        <td>用户名：</td><td><input id="unTextBox" type="text" class="easyui-validatebox" required="true" name="username" missingMessage="请输入用户名"/></td>
+        <td>用户ID或手机：</td><td><input id="unTextBox" type="text" class="easyui-validatebox" required="true" name="uid" missingMessage="请输入用户ID或手机"/></td>
     </tr>
     <tr>
         <td>密码：</td><td><input id="pwdTextBox" type="password" class="easyui-validatebox" required="true" name="password" missingMessage="请输入密码"/></td>

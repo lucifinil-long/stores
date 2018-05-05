@@ -59,7 +59,7 @@ func (mc *MainController) IsLoggedIn() {
 	if userinfo != nil {
 		rsp.Description = cTipLoggedin
 		res.Status = true
-		res.Redirect = configs.Homepage()
+		res.Redirect = configs.AdminHomepage()
 	} else {
 		rsp.Description = cTipRelogin
 	}
@@ -82,9 +82,9 @@ func (mc *MainController) Logout() {
 
 // Login handles login request
 func (mc *MainController) Login() {
-	username := mc.GetString(cUsername)
+	uid, _ := mc.GetInt64(cUID)
 	password := mc.GetString(cPassword)
-	user, err := CheckLogin(username, password)
+	user, err := CheckLogin(uid, password)
 	res := &proto.LoginRes{}
 	rsp := &proto.Response{
 		Protocol: res,
@@ -98,7 +98,7 @@ func (mc *MainController) Login() {
 		models.UpdateUserLoginTime(user.ID)
 		mc.OperationLog(cActionLogin, cRspLoginSuccess)
 
-		res.Redirect = config.GetConfigs().Homepage()
+		res.Redirect = config.GetConfigs().AdminHomepage()
 		res.User = *user
 
 		rsp.Status = proto.ReturnStatusSuccess
@@ -106,7 +106,7 @@ func (mc *MainController) Login() {
 		rsp.Protocol = res
 	} else {
 		log.Error("MainController.Login: login failed with error: %v", err)
-		mc.OperationLog(cActionLogin, fmt.Sprintf("%v login failed with %v", username, err))
+		mc.OperationLog(cActionLogin, fmt.Sprintf("%v login failed with %v", uid, err))
 		rsp.Status = proto.ReturnStatusFailed
 		rsp.Description = err.Error()
 	}
@@ -137,7 +137,7 @@ func (mc *MainController) ChangePassword() {
 		return
 	}
 
-	user, err := CheckLogin(userinfo.(proto.User).Username, oldPwd)
+	user, err := CheckLogin(int64(userinfo.(proto.User).ID), oldPwd)
 	if err == nil {
 		err = models.UpdateUserPassword(user.ID, utils.String2MD5(newPwd))
 
@@ -161,7 +161,7 @@ func (mc *MainController) ChangePassword() {
 	}
 
 	log.Info("MainController.ChangePassword: user '%v' modified password failed with %v",
-		userinfo.(proto.User).Username, err)
+		userinfo.(proto.User).Mobile, err)
 	mc.OperationLog(cActionModifyPwd, fmt.Sprintf("failed with %v", err))
 	mc.Response(&proto.Response{
 		Status:      proto.ReturnStatusFailed,

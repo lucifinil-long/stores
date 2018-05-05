@@ -11,19 +11,19 @@ func init() {
 	beego.AddFuncMap("stringsToJson", utils.Strings2JSON)
 
 	// pages
-	beego.Router("/", &controllers.PageController{}, "*:Homepage")
-	beego.Router("/pages/index", &controllers.PageController{}, "*:Homepage")
-	beego.Router("/pages/login", &controllers.PageController{}, "*:LoginPage")
-	beego.Router("/pages/admin/users", &controllers.PageController{}, "*:UsersPage")
-	beego.Router("/pages/admin/operations", &controllers.PageController{}, "*:OperationsPage")
+	beego.Router("/", &controllers.PageController{}, "*:AdminHomepage")
+	beego.Router("/pages/admin/index", &controllers.PageController{}, "*:AdminHomepage")
+	beego.Router("/pages/admin/login", &controllers.PageController{}, "*:AdminLoginPage")
+	beego.Router("/pages/admin/users", &controllers.PageController{}, "*:AdminUsersPage")
+	beego.Router("/pages/admin/operations", &controllers.PageController{}, "*:AdminOperationsPage")
 
-	// hompage related APIs
-	beego.Router("/public/treemenu", &controllers.MainController{}, "*:TreeMenu")
 	beego.Router("/public/isloggedin", &controllers.MainController{}, "*:IsLoggedIn")
-	beego.Router("/public/login", &controllers.MainController{}, "*:Login")
-	beego.Router("/public/logout", &controllers.MainController{}, "*:Logout")
-	beego.Router("/public/changepwd", &controllers.MainController{}, "*:ChangePassword")
-	beego.Router("/public/accesslist", &controllers.MainController{}, "*:AccessList")
+	// hompage related APIs
+	beego.Router("/public/admin/treemenu", &controllers.MainController{}, "*:TreeMenu")
+	beego.Router("/public/admin/login", &controllers.MainController{}, "*:Login")
+	beego.Router("/public/admin/logout", &controllers.MainController{}, "*:Logout")
+	beego.Router("/public/admin/changepwd", &controllers.MainController{}, "*:ChangePassword")
+	beego.Router("/public/admin/accesslist", &controllers.MainController{}, "*:AccessList")
 
 	// system user related
 	beego.Router("/admin/user/list", &controllers.UserController{}, "*:UserList")

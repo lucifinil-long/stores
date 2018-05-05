@@ -7,30 +7,30 @@ type PageController struct {
 	BaseController
 }
 
-// Homepage handles home page request
-func (pc *PageController) Homepage() {
+// AdminHomepage handles home page request
+func (pc *PageController) AdminHomepage() {
 	userInfo := pc.GetSession(cSessionUserInfoKey)
 	if userInfo == nil {
 		userInfo = db.StoresUser{}
 	}
 
 	pc.Data[cUserInfo] = userInfo
-	pc.TplName = "easyui/public/index.tpl"
+	pc.TplName = "easyui/admin/index.tpl"
 }
 
-// LoginPage handles login page request
-func (pc *PageController) LoginPage() {
-	pc.TplName = "easyui/public/login.tpl"
+// AdminLoginPage handles login page request
+func (pc *PageController) AdminLoginPage() {
+	pc.TplName = "easyui/admin/login.tpl"
 }
 
-// UsersPage handles logs page request
-func (pc *PageController) UsersPage() {
-	pc.TplName = "easyui/admin/user.tpl"
+// AdminUsersPage handles logs page request
+func (pc *PageController) AdminUsersPage() {
+	pc.TplName = "easyui/admin/users.tpl"
 	pc.OperationLog(cActionViewUserList)
 }
 
-// OperationsPage handles logs page request
-func (pc *PageController) OperationsPage() {
+// AdminOperationsPage handles logs page request
+func (pc *PageController) AdminOperationsPage() {
 	pc.TplName = "easyui/admin/operations.tpl"
 	pc.OperationLog(cActionViewOperationLogsList)
 }
