@@ -71,12 +71,12 @@ func protoNewUser2DBUser(user *proto.NewUser) *db.StoresUser {
 	}
 }
 
-// assignAccessToUser assign accesses to user
-func assignAccessToUser(session *xorm.Session, uid int, accesses []int) error {
-	records := []db.StoresUserNode{}
-	err := session.Table(cTableStoresUserNode).Where("user_id=?", uid).Find(&records)
+// assignAccessToRole assign accesses to user
+func assignAccessToRole(session *xorm.Session, rid int, accesses []int) error {
+	records := []db.StoresRoleNode{}
+	err := session.Table(cTableStoresRoleNode).Where("role_id=?", rid).Find(&records)
 	sql, params := session.LastSQL()
-	log.Trace("models.assignAccessToUser: query sql: `%v`, parameters: %v", sql, params)
+	log.Trace("models.assignAccessToRole: query sql: `%v`, parameters: %v", sql, params)
 	if err != nil {
 		return err
 	}
@@ -100,33 +100,33 @@ func assignAccessToUser(session *xorm.Session, uid int, accesses []int) error {
 		}
 
 		if same {
-			log.Trace("models.assignAccessToUser returned for user access is not changed.")
+			log.Trace("models.assignAccessToRole returned for user access is not changed.")
 			return nil
 		}
 	}
 
 	// remove current access of user before assign new accesses
-	if err = removeAccessOfUser(session, uid); err != nil {
+	if err = removeAccessOfRole(session, rid); err != nil {
 		return err
 	}
 
-	inserts := make([]db.StoresUserNode, 0, len(accesses))
+	inserts := make([]db.StoresRoleNode, 0, len(accesses))
 	for _, val := range accesses {
-		record := db.StoresUserNode{UserId: uid, NodeId: val}
+		record := db.StoresRoleNode{RoleId: rid, NodeId: val}
 		inserts = append(inserts, record)
 	}
-	_, err = session.Table(cTableStoresUserNode).InsertMulti(inserts)
+	_, err = session.Table(cTableStoresRoleNode).InsertMulti(inserts)
 	sql, params = session.LastSQL()
 	log.Trace("models.assignAccessToUser: sql: `%v`, parameters: %v", sql, params)
 
 	return err
 }
 
-// removeAccessOfUser remove accesses of user
-func removeAccessOfUser(session *xorm.Session, uid int) error {
-	_, err := session.Table(cTableStoresUserNode).Where("user_id=?", uid).Delete(db.StoresUserNode{})
+// removeAccessOfRole remove accesses of user
+func removeAccessOfRole(session *xorm.Session, rid int) error {
+	_, err := session.Table(cTableStoresRoleNode).Where("role_id=?", rid).Delete(db.StoresRoleNode{})
 	sql, params := session.LastSQL()
-	log.Trace("models.removeAccessOfUser: sql: `%v`, parameters: %v, error: %v", sql, params, err)
+	log.Trace("models.removeAccessOfRole: sql: `%v`, parameters: %v, error: %v", sql, params, err)
 
 	return err
 }
@@ -375,7 +375,7 @@ func addUser(session *xorm.Session, user *proto.NewUser) error {
 		return proto.ErrCommonInternalError
 	}
 
-	return assignAccessToUser(session, dbUser.Id, user.Accesses)
+	return nil
 }
 
 // addDBUser handles add user to database request
@@ -426,16 +426,20 @@ func deleteUser(session *xorm.Session, uid int) error {
 		return err
 	}
 
-	return removeAccessOfUser(session, uid)
+	return nil
 }
 
-// deleteDBUser delete specified user from user table
+// deleteDBUser marks specified user in user table is deleted
 // @param session is the database session, can be nil; if nil will use default database session
 // @param uid is the user id in database
 // @return nil if successful; otherwise return an error
 func deleteDBUser(session *xorm.Session, uid int) error {
-	user := &db.StoresUser{Id: uid}
-	_, err := session.Table(user).Where("id=?", uid).Delete(user)
+	user := &db.StoresUser{Id: uid, Deleted: 1}
+	_, err := session.Table(user).
+		Where("id=?", uid).
+		And("deleted=1").
+		Cols("deleted").
+		Update(user)
 	return err
 }
 

@@ -222,11 +222,11 @@ type User struct {
 	ID            int    `json:"id"`       // 用户ID
 	Username      string `json:"username"` // 用户登录名
 	Password      string
-	Nickname      string `json:"nickname"` // 用户昵称
-	Mobile        string `json:"mobile"`   // 用户手机
-	Remark        string `json:"remark"`   // 备注
-	Status        int    `json:"status"`   // 用户状态，0为禁用，1为启用
-	Level         int
+	Nickname      string `json:"nickname"`        // 用户昵称
+	Mobile        string `json:"mobile"`          // 用户手机
+	Remark        string `json:"remark"`          // 备注
+	Status        int    `json:"status"`          // 用户状态，0为禁用，1为启用
+	Level         int    `json:"level"`           // 用户消费累计等级
 	LastLoginTime string `json:"last_login_time"` // 最后登录时间，格式为2017-12-05T15:48:31+08:00
 	CreatedTime   string `json:"created_time"`    // 创建时间，格式为2017-12-05T15:48:31+08:00
 }

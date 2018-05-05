@@ -17,6 +17,8 @@ type StoresUser struct {
 	Remark        string    `json:"remark" xorm:"VARCHAR(512)"`
 	Status        int       `json:"status" xorm:"not null default 1 TINYINT(4)"`
 	Level         int       `json:"level" xorm:"not null default 0 TINYINT(4)"`
+	Deletable     int       `json:"deletable" xorm:"not null default 1 TINYINT(4)"`
+	Deleted       int       `json:"deleted" xorm:"not null default 0 TINYINT(4)"`
 	LastLoginTime time.Time `json:"last_login_time" xorm:"DATETIME"`
 	CreatedTime   time.Time `json:"created_time" xorm:"not null DATETIME"`
 }

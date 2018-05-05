@@ -3,8 +3,8 @@
 
 package db
 
-// StoresRoleNodes is the database model struct
-type StoresRoleNodes struct {
+// StoresRoleNode is the database model struct
+type StoresRoleNode struct {
 	RoleId int `json:"role_id" xorm:"not null pk INT(11)"`
 	NodeId int `json:"node_id" xorm:"not null pk index INT(11)"`
 }

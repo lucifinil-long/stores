@@ -59,13 +59,15 @@ CREATE TABLE `stores_user` (
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '用户状态，0为禁用，1为启用',
   `level` tinyint(4) NOT NULL DEFAULT '0' COMMENT '用户消费累计等级',
+  `deletable` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否可删除',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否已删除',
   `last_login_time` datetime DEFAULT NULL,
   `created_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_un` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /* insert super administrator with password @dminPwd */
-INSERT INTO `stores_user` (`username`,`password`,`nickname`, `mobile`, `created_time`) VALUES ('admin', '5106e9dd4f30c7a042569a4e3d42b4a4', 'super administrator', '13888888888', NOW());
+INSERT INTO `stores_user` (`username`,`password`,`nickname`, `mobile`, `deletable`, `created_time`) VALUES ('admin', '5106e9dd4f30c7a042569a4e3d42b4a4', 'super administrator', '13888888888', 0, NOW());
 
 /* 
  * 后台操作日志表
@@ -84,40 +86,44 @@ CREATE TABLE `stores_op_log` (
 /* 
  * 用户角色授权访问信息
  */
-CREATE TABLE `stores_roles` (
+CREATE TABLE `stores_role` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(128) NOT NULL COMMENT '角色类型',
   `remark` varchar(512) DEFAULT NULL COMMENT '备注',
   `deletable` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否可删除',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_name` (`role_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-INSERT INTO `stores_roles` (`role_name`, `remark`, `deletable`) VALUES ('超级管理员', '后台超级管理员', 0);
-INSERT INTO `stores_roles` (`role_name`, `remark`) VALUES ('管理员', '后台管理员');
-INSERT INTO `stores_roles` (`role_name`, `remark`) VALUES ('库管', '库管员工');
-INSERT INTO `stores_roles` (`role_name`, `remark`) VALUES ('销售', '销售员工');
+INSERT INTO `stores_role` (`role_name`, `remark`, `deletable`) VALUES ('超级管理员', '后台超级管理员', 0);
+INSERT INTO `stores_role` (`role_name`, `remark`) VALUES ('管理员', '后台管理员');
+INSERT INTO `stores_role` (`role_name`, `remark`) VALUES ('库管', '库管员工');
+INSERT INTO `stores_role` (`role_name`, `remark`) VALUES ('销售', '销售员工');
+INSERT INTO `stores_role` (`role_name`, `remark`) VALUES ('超级VIP客户', '客户');
+INSERT INTO `stores_role` (`role_name`, `remark`) VALUES ('VIP客户', '客户');
+INSERT INTO `stores_role` (`role_name`, `remark`) VALUES ('客户', '客户');
 
 /* 
  * 用户角色授权访问信息
  */
-CREATE TABLE `stores_role_nodes` (
+CREATE TABLE `stores_role_node` (
   `role_id` int(11) NOT NULL COMMENT '用户角色类型ID',
   `node_id` int(11) NOT NULL COMMENT '授权访问节点ID',
   PRIMARY KEY (`role_id`, `node_id`),
-  FOREIGN KEY (`role_id`) REFERENCES stores_roles(`id`),
+  FOREIGN KEY (`role_id`) REFERENCES stores_role(`id`),
   FOREIGN KEY (`node_id`) REFERENCES stores_node(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /* 
  * 用户角色授权访问信息
  */
-CREATE TABLE `stores_role_users` (
+CREATE TABLE `stores_role_user` (
   `role_id` int(11) NOT NULL COMMENT '用户角色类型ID',
   `user_id` int(11) NOT NULL COMMENT '用户ID',
   PRIMARY KEY (`role_id`, `user_id`),
-  FOREIGN KEY (`role_id`) REFERENCES stores_roles(`id`),
+  FOREIGN KEY (`role_id`) REFERENCES stores_role(`id`),
   FOREIGN KEY (`user_id`) REFERENCES stores_user(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-INSERT INTO `stores_role_users` (`role_id`, `user_id`) VALUES (1, 1);
+INSERT INTO `stores_role_user` (`role_id`, `user_id`) VALUES (1, 1);
 
 
 
