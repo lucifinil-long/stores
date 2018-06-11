@@ -135,7 +135,6 @@ func (cfg *Configs) initOrmEngine() error {
 			return err
 		}
 		log.Info("initOrmEngine is done successfully.")
-		log.Trace("connect string: %v", dataSourceName)
 	} else {
 		return fmt.Errorf("not supportted db driver: %v", dbDriver)
 	}

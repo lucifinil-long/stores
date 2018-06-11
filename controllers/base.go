@@ -62,7 +62,7 @@ func (bc BaseController) CurrentUser() *proto.User {
 // @param action is action summary
 // @param details are more addtional detail
 func (bc BaseController) OperationLog(action string, details ...string) {
-	uid := 0
+	uid := int64(0)
 	nickname := ""
 	user := bc.GetSession(cSessionUserInfoKey)
 	if user != nil {

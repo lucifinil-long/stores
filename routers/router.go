@@ -16,6 +16,8 @@ func init() {
 	beego.Router("/pages/admin/login", &controllers.PageController{}, "*:AdminLoginPage")
 	beego.Router("/pages/admin/users", &controllers.PageController{}, "*:AdminUsersPage")
 	beego.Router("/pages/admin/operations", &controllers.PageController{}, "*:AdminOperationsPage")
+	beego.Router("/pages/admin/commodities", &controllers.PageController{}, "*:CommoditiesPage")
+	beego.Router("/pages/admin/locations", &controllers.PageController{}, "*:AdminLocationsPage")
 
 	beego.Router("/public/isloggedin", &controllers.MainController{}, "*:IsLoggedIn")
 	// hompage related APIs
@@ -29,4 +31,14 @@ func init() {
 	beego.Router("/admin/user/list", &controllers.UserController{}, "*:UserList")
 	beego.Router("/admin/user/add", &controllers.UserController{}, "*:AddUser")
 	beego.Router("/admin/user/delete", &controllers.UserController{}, "*:DeleteUser")
+
+	// location related
+	beego.Router("/admin/depot/list", &controllers.LocationController{}, "*:DepotList")
+	beego.Router("/admin/depot/delete", &controllers.LocationController{}, "*:DeleteDepot")
+	beego.Router("/admin/depot/add", &controllers.LocationController{}, "*:AddDepot")
+	beego.Router("/admin/depot/update", &controllers.LocationController{}, "*:UpdateDepot")
+	beego.Router("/admin/depot/shelf/list", &controllers.LocationController{}, "*:ShelfList")
+	beego.Router("/admin/depot/shelf/add", &controllers.LocationController{}, "*:AddShelfs")
+	beego.Router("/admin/depot/shelf/delete", &controllers.LocationController{}, "*:DeleteShelf")
+	beego.Router("/admin/depot/shelf/update", &controllers.LocationController{}, "*:UpdateShelf")
 }

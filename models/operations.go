@@ -15,7 +15,7 @@ import (
 // @param nickname is the nickname of user that makes operation
 // @param action is action summary
 // @param detail is action detail
-func AddOperationLog(uid int, nickname, from, action, detail string) {
+func AddOperationLog(uid int64, nickname, from, action, detail string) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
@@ -29,7 +29,7 @@ func AddOperationLog(uid int, nickname, from, action, detail string) {
 // @param nickname is the nickname of user that makes operation
 // @param action is action summary
 // @param detail is action detail
-func addOperationLog(session *xorm.Session, uid int, nickname, from, action, detail string) {
+func addOperationLog(session *xorm.Session, uid int64, nickname, from, action, detail string) {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()

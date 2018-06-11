@@ -23,7 +23,7 @@ func (pc *PageController) AdminLoginPage() {
 	pc.TplName = "easyui/admin/login.tpl"
 }
 
-// AdminUsersPage handles logs page request
+// AdminUsersPage handles user list page request
 func (pc *PageController) AdminUsersPage() {
 	pc.TplName = "easyui/admin/users.tpl"
 	pc.OperationLog(cActionViewUserList)
@@ -33,4 +33,16 @@ func (pc *PageController) AdminUsersPage() {
 func (pc *PageController) AdminOperationsPage() {
 	pc.TplName = "easyui/admin/operations.tpl"
 	pc.OperationLog(cActionViewOperationLogsList)
+}
+
+// CommoditiesPage handles commodities page request
+func (pc *PageController) CommoditiesPage() {
+	pc.TplName = "easyui/commodity/commodities.tpl"
+	pc.OperationLog(cActionViewOperationLogsList)
+}
+
+// AdminLocationsPage handles location page request
+func (pc *PageController) AdminLocationsPage() {
+	pc.TplName = "easyui/admin/locations.tpl"
+	pc.OperationLog(cActionViewLocationList)
 }

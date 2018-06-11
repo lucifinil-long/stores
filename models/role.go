@@ -8,7 +8,7 @@ import (
 	"github.com/lucifinil-long/stores/models/db"
 )
 
-func getUserRoles(session *xorm.Session, uid int) (string, error) {
+func getUserRoles(session *xorm.Session, uid int64) (string, error) {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()

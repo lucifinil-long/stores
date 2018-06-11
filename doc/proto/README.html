@@ -160,7 +160,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <p>API请求接口使用统一的返回JSON结构：</p>
 <pre><code class="hljs js">{
 	<span class="hljs-string">"status"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 返回码(参见枚举 ReturnStatus)</span>
-	<span class="hljs-string">"description"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 返回码描述</span>
+	<span class="hljs-string">"info"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 返回码描述</span>
 	<span class="hljs-string">"protocol"</span>: {} <span class="hljs-comment">// 协议数据</span>
 }
 </code></pre>
@@ -208,11 +208,10 @@ username=xxx&amp;password=xxx
 {
 	<span class="hljs-string">"user"</span>: {
 		<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户ID</span>
-		<span class="hljs-string">"username"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户登录名</span>
 		<span class="hljs-string">"nickname"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户昵称</span>
-		<span class="hljs-string">"mobile"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户手机</span>
+		<span class="hljs-string">"mobile"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户手机</span>
 		<span class="hljs-string">"remark"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 备注</span>
-		<span class="hljs-string">"status"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户状态，0为禁用，1为启用</span>
+		<span class="hljs-string">"role"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户角色</span>
 		<span class="hljs-string">"last_login_time"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 最后登录时间，格式为2017-12-05T15:48:31+08:00</span>
 		<span class="hljs-string">"created_time"</span>: <span class="hljs-string">"value"</span> <span class="hljs-comment">// 创建时间，格式为2017-12-05T15:48:31+08:00</span>
 	},
@@ -271,11 +270,10 @@ page=xxx&amp;rows=xxx&amp;sort=xxx&amp;order=xxx
 	<span class="hljs-string">"rows"</span>: [
 	{
 			<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户ID</span>
-			<span class="hljs-string">"username"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户登录名</span>
 			<span class="hljs-string">"nickname"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户昵称</span>
-			<span class="hljs-string">"mobile"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户手机</span>
+			<span class="hljs-string">"mobile"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户手机</span>
 			<span class="hljs-string">"remark"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 备注</span>
-			<span class="hljs-string">"status"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户状态，0为禁用，1为启用</span>
+			<span class="hljs-string">"role"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户角色</span>
 			<span class="hljs-string">"last_login_time"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 最后登录时间，格式为2017-12-05T15:48:31+08:00</span>
 			<span class="hljs-string">"created_time"</span>: <span class="hljs-string">"value"</span> <span class="hljs-comment">// 创建时间，格式为2017-12-05T15:48:31+08:00</span>
 		}
@@ -289,13 +287,10 @@ insert=xxx
 <span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
 {
 	<span class="hljs-string">"insert"</span>: {
-		<span class="hljs-string">"username"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// ���户登录名，必填项</span>
+		<span class="hljs-string">"mobile"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户手机，必填项</span>
 		<span class="hljs-string">"nickname"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户昵称</span>
 		<span class="hljs-string">"password"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户密码</span>
-		<span class="hljs-string">"mobile"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 用户手机</span>
-		<span class="hljs-string">"remark"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 备注</span>
-		<span class="hljs-string">"status"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 用户状态，0为禁用，1为启用</span>
-		<span class="hljs-string">"access"</span>: [<span class="hljs-number">0</span>] <span class="hljs-comment">// 用户权限ID列表</span>
+		<span class="hljs-string">"remark"</span>: <span class="hljs-string">"value"</span> <span class="hljs-comment">// 备注</span>
 	}
 }
 
@@ -375,6 +370,173 @@ page=xxx&amp;rows=xxx&amp;sort=xxx&amp;order=xxx
 		}
 	] <span class="hljs-comment">// 操作日志列表指定页数据</span>
 }
+</code></pre>
+<h3>API接口'/location/depots/list' 获取仓库数据</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+page=xxx&amp;rows=xxx&amp;sort=xxx&amp;order=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"page"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 请求分页数据的第几页数据，必填项</span>
+	<span class="hljs-string">"rows"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 每页数据的分页条数，必填项</span>
+	<span class="hljs-string">"sort"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 排序字段名，取值为下发的邮件服务配置数据的字段，可选项</span>
+	<span class="hljs-string">"order"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 排序方向，参见SortDirection定义，可选项</span>
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+{
+	<span class="hljs-string">"total"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 总的操作日志记录数</span>
+	<span class="hljs-string">"rows"</span>: [
+	{
+			<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+			<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+			<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>,
+			<span class="hljs-string">"shelfs"</span>: [
+	{
+					<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+					<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+					<span class="hljs-string">"layers"</span>: <span class="hljs-number">0</span>,
+					<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>
+				}
+			]
+		}
+	] <span class="hljs-comment">// 操作日志列表指定页数据</span>
+}
+</code></pre>
+<h3>API接口'/location/depots/add' 提交添加一个新仓库的请求</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+insert=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"insert"</span>: {
+		<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+		<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+		<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>,
+		<span class="hljs-string">"shelfs"</span>: [
+	{
+				<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+				<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+				<span class="hljs-string">"layers"</span>: <span class="hljs-number">0</span>,
+				<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>
+			}
+		]
+	}
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+本接口不返回json格式数据
+</code></pre>
+<h3>API接口'/location/depots/update' 提交更新一个仓库的请求, 仅更新仓库属性，不更新货架信息</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+update=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"update"</span>: {
+		<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+		<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+		<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>,
+		<span class="hljs-string">"shelfs"</span>: [
+	{
+				<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+				<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+				<span class="hljs-string">"layers"</span>: <span class="hljs-number">0</span>,
+				<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>
+			}
+		]
+	}
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+本接口不返回json格式数据
+</code></pre>
+<h3>API接口'/location/depots/update' 提交删除仓库的请求</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+depot_ids=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"depot_ids"</span>: [<span class="hljs-number">0</span>] <span class="hljs-comment">//  需要删除的仓库信息</span>
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+本接口不返回json格式数据
+</code></pre>
+<h3>API接口'/location/shelfs/list' 获取仓库货架数据</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+page=xxx&amp;rows=xxx&amp;sort=xxx&amp;order=xxx&amp;depot_id=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"page"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 请求分页数据的第几页数据，必填项</span>
+	<span class="hljs-string">"rows"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 每页数据的分页条数，必填项</span>
+	<span class="hljs-string">"sort"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 排序字段名，取值为下发的邮件服务配置数据的字段，可选项</span>
+	<span class="hljs-string">"order"</span>: <span class="hljs-string">"value"</span>, <span class="hljs-comment">// 排序方向，参见SortDirection定义，可选项</span>
+	<span class="hljs-string">"depot_id"</span>: <span class="hljs-number">0</span> <span class="hljs-comment">// 货架所在的仓库ID</span>
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+{
+	<span class="hljs-string">"total"</span>: <span class="hljs-number">0</span>, <span class="hljs-comment">// 总的操作日志记录数</span>
+	<span class="hljs-string">"rows"</span>: [
+	{
+			<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+			<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+			<span class="hljs-string">"layers"</span>: <span class="hljs-number">0</span>,
+			<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>
+		}
+	] <span class="hljs-comment">// 操作日志列表指定页数据</span>
+}
+</code></pre>
+<h3>API接口'/location/shelfs/add' 提交添加一个新仓库货架的请求</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+depot_id=xxx&amp;shelfs=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"depot_id"</span>: <span class="hljs-number">0</span>,
+	<span class="hljs-string">"shelfs"</span>: [
+	{
+			<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+			<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+			<span class="hljs-string">"layers"</span>: <span class="hljs-number">0</span>,
+			<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>
+		}
+	] <span class="hljs-comment">// 添加的仓库信息</span>
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+本接口不返回json格式数据
+</code></pre>
+<h3>API接口'/location/shelfs/update' 提交更新一个仓库货架的请求</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+update=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"update"</span>: {
+		<span class="hljs-string">"id"</span>: <span class="hljs-number">0</span>,
+		<span class="hljs-string">"name"</span>: <span class="hljs-string">"value"</span>,
+		<span class="hljs-string">"layers"</span>: <span class="hljs-number">0</span>,
+		<span class="hljs-string">"detail"</span>: <span class="hljs-string">"value"</span>
+	}
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+本接口不返回json格式数据
+</code></pre>
+<h3>API接口'/location/shelfs/delete' 提交删除仓库货架的请求</h3>
+<p>访问方法: *</p>
+<pre><code class="hljs js"><span class="hljs-comment">// 请求表单参数示例</span>
+shelf_ids=xxx
+<span class="hljs-comment">// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)</span>
+{
+	<span class="hljs-string">"shelf_ids"</span>: [<span class="hljs-number">0</span>] <span class="hljs-comment">//  需要删除的仓库货架信息</span>
+}
+
+<span class="hljs-comment">// 返回JSON示例(仅Response.Protocol部分)</span>
+本接口不返回json格式数据
 </code></pre>
 <h2>页面请求</h2>
 <h3>访问'/', '/pages/index'可以获取首页页面</h3>

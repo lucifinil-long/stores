@@ -42,7 +42,7 @@ API请求接口使用统一的返回JSON结构：
 ```js
 {
 	"status": 0, // 返回码(参见枚举 ReturnStatus)
-	"description": "value", // 返回码描述
+	"info": "value", // 返回码描述
 	"protocol": {} // 协议数据
 }
 ```
@@ -99,11 +99,10 @@ username=xxx&password=xxx
 {
 	"user": {
 		"id": 0, // 用户ID
-		"username": "value", // 用户登录名
 		"nickname": "value", // 用户昵称
-		"mobile": "value", // 用户手机
+		"mobile": 0, // 用户手机
 		"remark": "value", // 备注
-		"status": 0, // 用户状态，0为禁用，1为启用
+		"role": "value", // 用户角色
 		"last_login_time": "value", // 最后登录时间，格式为2017-12-05T15:48:31+08:00
 		"created_time": "value" // 创建时间，格式为2017-12-05T15:48:31+08:00
 	},
@@ -171,11 +170,10 @@ page=xxx&rows=xxx&sort=xxx&order=xxx
 	"rows": [
 	{
 			"id": 0, // 用户ID
-			"username": "value", // 用户登录名
 			"nickname": "value", // 用户昵称
-			"mobile": "value", // 用户手机
+			"mobile": 0, // 用户手机
 			"remark": "value", // 备注
-			"status": 0, // 用户状态，0为禁用，1为启用
+			"role": "value", // 用户角色
 			"last_login_time": "value", // 最后登录时间，格式为2017-12-05T15:48:31+08:00
 			"created_time": "value" // 创建时间，格式为2017-12-05T15:48:31+08:00
 		}
@@ -192,13 +190,10 @@ insert=xxx
 // 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
 {
 	"insert": {
-		"username": "value", // ���户登录名，必填项
+		"mobile": 0, // 用户手机，必填项
 		"nickname": "value", // 用户昵称
 		"password": "value", // 用户密码
-		"mobile": "value", // 用户手机
-		"remark": "value", // 备注
-		"status": 0, // 用户状态，0为禁用，1为启用
-		"access": [0] // 用户权限ID列表
+		"remark": "value" // 备注
 	}
 }
 
@@ -290,6 +285,197 @@ page=xxx&rows=xxx&sort=xxx&order=xxx
 		}
 	] // 操作日志列表指定页数据
 }
+```
+
+### API接口'/location/depots/list' 获取仓库数据
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+page=xxx&rows=xxx&sort=xxx&order=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"page": 0, // 请求分页数据的第几页数据，必填项
+	"rows": 0, // 每页数据的分页条数，必填项
+	"sort": "value", // 排序字段名，取值为下发的邮件服务配置数据的字段，可选项
+	"order": "value", // 排序方向，参见SortDirection定义，可选项
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+{
+	"total": 0, // 总的操作日志记录数
+	"rows": [
+	{
+			"id": 0,
+			"name": "value",
+			"detail": "value",
+			"shelfs": [
+	{
+					"id": 0,
+					"name": "value",
+					"layers": 0,
+					"detail": "value"
+				}
+			]
+		}
+	] // 操作日志列表指定页数据
+}
+```
+
+### API接口'/location/depots/add' 提交添加一个新仓库的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+insert=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"insert": {
+		"id": 0,
+		"name": "value",
+		"detail": "value",
+		"shelfs": [
+	{
+				"id": 0,
+				"name": "value",
+				"layers": 0,
+				"detail": "value"
+			}
+		]
+	}
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/location/depots/update' 提交更新一个仓库的请求, 仅更新仓库属性，不更新货架信息
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+update=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"update": {
+		"id": 0,
+		"name": "value",
+		"detail": "value",
+		"shelfs": [
+	{
+				"id": 0,
+				"name": "value",
+				"layers": 0,
+				"detail": "value"
+			}
+		]
+	}
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/location/depots/update' 提交删除仓库的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+depot_ids=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"depot_ids": [0] //  需要删除的仓库信息
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/location/shelfs/list' 获取仓库货架数据
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+page=xxx&rows=xxx&sort=xxx&order=xxx&depot_id=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"page": 0, // 请求分页数据的第几页数据，必填项
+	"rows": 0, // 每页数据的分页条数，必填项
+	"sort": "value", // 排序字段名，取值为下发的邮件服务配置数据的字段，可选项
+	"order": "value", // 排序方向，参见SortDirection定义，可选项
+	"depot_id": 0 // 货架所在的仓库ID
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+{
+	"total": 0, // 总的操作日志记录数
+	"rows": [
+	{
+			"id": 0,
+			"name": "value",
+			"layers": 0,
+			"detail": "value"
+		}
+	] // 操作日志列表指定页数据
+}
+```
+
+### API接口'/location/shelfs/add' 提交添加一个新仓库货架的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+depot_id=xxx&shelfs=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"depot_id": 0,
+	"shelfs": [
+	{
+			"id": 0,
+			"name": "value",
+			"layers": 0,
+			"detail": "value"
+		}
+	] // 添加的仓库信息
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/location/shelfs/update' 提交更新一个仓库货架的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+update=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"update": {
+		"id": 0,
+		"name": "value",
+		"layers": 0,
+		"detail": "value"
+	}
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/location/shelfs/delete' 提交删除仓库货架的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+shelf_ids=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"shelf_ids": [0] //  需要删除的仓库货架信息
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
 ```
 
 

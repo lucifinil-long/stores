@@ -38,7 +38,7 @@ func GetTreeMenuForUser(user *proto.User) []*proto.TreeMenuNode {
 // @param recursive indicates whether load tree nodes recursively
 // @param accessIds is user access node list
 // @return first sub level tree node list of specified parent id node, not includes parent node
-func loadTree(session *xorm.Session, pid int, menu, recursive bool, accessIds ...interface{}) []*proto.TreeMenuNode {
+func loadTree(session *xorm.Session, pid int64, menu, recursive bool, accessIds ...interface{}) []*proto.TreeMenuNode {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()
@@ -84,7 +84,7 @@ func loadTree(session *xorm.Session, pid int, menu, recursive bool, accessIds ..
 // @param menu is the flag of tree menu
 // @param accessIds is id set of access nodes that user can access, include no need auth nodes; if empty, will not check auth
 // @return ([]*db.StoresNode, nil) if successful; otherwise return ([]*db.GwAdminNode, error)
-func getSubTreeNodes(session *xorm.Session, pid int, menu bool, accessIds ...interface{}) ([]*db.StoresNode, error) {
+func getSubTreeNodes(session *xorm.Session, pid int64, menu bool, accessIds ...interface{}) ([]*db.StoresNode, error) {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()
@@ -113,7 +113,7 @@ func getSubTreeNodes(session *xorm.Session, pid int, menu bool, accessIds ...int
 // @param pid is the id of parent node id
 // @param menu is the flag of tree menu
 // @return ([]*proto.AccessTreeNode or nil, nil) if successful; otherwise return (nil, error)
-func GetAccessTree(pid int) ([]*proto.AccessTreeNode, error) {
+func GetAccessTree(pid int64) ([]*proto.AccessTreeNode, error) {
 	return getAccessTree(nil, pid)
 }
 
@@ -122,7 +122,7 @@ func GetAccessTree(pid int) ([]*proto.AccessTreeNode, error) {
 // @param pid is the id of parent node id
 // @param menu is the flag of tree menu
 // @return ([]*proto.AccessTreeNode or nil, nil) if successful; otherwise return (nil, error)
-func getAccessTree(session *xorm.Session, pid int) ([]*proto.AccessTreeNode, error) {
+func getAccessTree(session *xorm.Session, pid int64) ([]*proto.AccessTreeNode, error) {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()

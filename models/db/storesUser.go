@@ -9,7 +9,7 @@ import (
 
 // StoresUser is the database model struct
 type StoresUser struct {
-	Id            int       `json:"id" xorm:"not null pk autoincr INT(11)"`
+	Id            int64     `json:"id" xorm:"pk autoincr BIGINT(20)"`
 	Mobile        int64     `json:"mobile" xorm:"not null unique BIGINT(20)"`
 	Nickname      string    `json:"nickname" xorm:"not null default '' VARCHAR(128)"`
 	Password      string    `json:"password" xorm:"not null default '' VARCHAR(64)"`

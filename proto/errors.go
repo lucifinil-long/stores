@@ -21,6 +21,17 @@ var (
 )
 
 var (
+	// ErrCanNotDeleteDepotsForStock is the error for delete depots failed for stock
+	ErrCanNotDeleteDepotsForStock = errors.New("待删除的仓库尚有库存，请清空库存后再删除")
+	// ErrDepotIsNotExist is the error for the depot is not exist
+	ErrDepotIsNotExist = errors.New("指定仓库不存在")
+	// ErrEmptyShelfName is the error for empty shelf name
+	ErrEmptyShelfName = errors.New("货架名不能为空")
+	// ErrCanNotDeleteShelfsForStock is the error for delete depots failed for stock
+	ErrCanNotDeleteShelfsForStock = errors.New("待删除的仓库货架尚有库存，请清空库存后再删除")
+)
+
+var (
 	// ErrCommonInvalidParam is common invalid parameter error
 	ErrCommonInvalidParam = errors.New("错误参数")
 	// ErrCommonInternalError is common internal error

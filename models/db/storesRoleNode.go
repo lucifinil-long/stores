@@ -5,6 +5,6 @@ package db
 
 // StoresRoleNode is the database model struct
 type StoresRoleNode struct {
-	RoleId int `json:"role_id" xorm:"not null pk INT(11)"`
-	NodeId int `json:"node_id" xorm:"not null pk index INT(11)"`
+	RoleId int64 `json:"role_id" xorm:"not null pk BIGINT(20)"`
+	NodeId int64 `json:"node_id" xorm:"not null pk index BIGINT(20)"`
 }

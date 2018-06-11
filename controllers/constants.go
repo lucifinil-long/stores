@@ -11,6 +11,8 @@ const (
 	cInserts = "inserts"
 	cDeletes = "deletes"
 	cUpdated = "updated"
+	cInsert  = "insert"
+	cReq     = "req"
 )
 
 const (
@@ -28,6 +30,7 @@ const (
 	cOrder         = "order"
 	cSortDirection = "desc"
 	cUserID        = "uid"
+	cDepotID       = "depot_id"
 )
 
 const (
@@ -39,6 +42,8 @@ const (
 	cActionDeleteUser            = "删除用户"
 	cActionViewUserList          = "查看仓储管理系统用户列表"
 	cActionViewOperationLogsList = "查看仓储管理系统操作日志"
+	cActionViewCommoditiesList   = "查看商品定义列表"
+	cActionViewLocationList      = "查看库房列表"
 )
 
 const (

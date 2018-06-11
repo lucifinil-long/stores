@@ -124,7 +124,7 @@ func (uc *UserController) DeleteUser() {
 		return
 	}
 
-	uid, _ := uc.GetInt(cUserID, 0)
+	uid, _ := uc.GetInt64(cUserID, 0)
 
 	if currentUser.ID == uid {
 		rsp.Description = proto.ErrCanNotDeleteSelf.Error()

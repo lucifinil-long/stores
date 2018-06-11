@@ -126,8 +126,8 @@ type TreeMenuReq struct {
 
 // TreeMenuNode is struct for tree menu node
 type TreeMenuNode struct {
-	ID         int             `json:"id"`         // 节点ID
-	PID        int             `json:"pid"`        // 父节点ID
+	ID         int64           `json:"id"`         // 节点ID
+	PID        int64           `json:"pid"`        // 父节点ID
 	Text       string          `json:"text"`       // 显示文本
 	IconCls    string          `json:"iconCls"`    // 图标
 	Attributes Attributes      `json:"attributes"` // 属性
@@ -196,11 +196,11 @@ const (
 
 // AccessTreeNode is struct for tree node of access
 type AccessTreeNode struct {
-	ID       int               `json:"id"`       // 权限节点ID
+	ID       int64             `json:"id"`       // 权限节点ID
 	Title    string            `json:"title"`    // 权限节点显示标题
 	Path     string            `json:"path"`     // 权限节点关联的路径
 	Level    int               `json:"level"`    // 节点在权限树中的层次
-	Pid      int               `json:"pid"`      // 父节点ID
+	Pid      int64             `json:"pid"`      // 父节点ID
 	Auth     int               `json:"auth"`     // 授权需要，参见AuthStatus定义
 	Icon     string            `json:"icon"`     // 图标
 	Remark   string            `json:"remark"`   // 备注
@@ -219,7 +219,7 @@ type AccessListRes []AccessTreeNode
 
 // User is the admin user entry
 type User struct {
-	ID            int    `json:"id"`              // 用户ID
+	ID            int64  `json:"id"`              // 用户ID
 	Nickname      string `json:"nickname"`        // 用户昵称
 	Mobile        int64  `json:"mobile"`          // 用户手机
 	Remark        string `json:"remark"`          // 备注
@@ -249,7 +249,7 @@ type NewUser struct {
 	Nickname string `json:"nickname"` // 用户昵称
 	Password string `json:"password"` // 用户密码
 	Remark   string `json:"remark"`   // 备注
-	ID       int    // 用户ID
+	ID       int64  // 用户ID
 }
 
 // AddUserReq 提交添加一个新用户的请求
@@ -339,4 +339,128 @@ type OperationLogListRes struct {
 	ResCommon
 	Total int64          `json:"total"` // 总的操作日志记录数
 	Rows  []OperationLog `json:"rows"`  // 操作日志列表指定页数据
+}
+
+// Shelf is the shelf in depot
+type Shelf struct {
+	ID     int64  `json:"id"`
+	Name   string `json:"name"`
+	Layers int    `json:"layers"`
+	Detail string `json:"detail"`
+}
+
+// Depot is the depot
+type Depot struct {
+	ID     int64   `json:"id"`
+	Name   string  `json:"name"`
+	Detail string  `json:"detail"`
+	Shelfs []Shelf `json:"shelfs"`
+}
+
+// DepotsListReq 获取仓库数据
+// path: '/location/depots/list'
+// method: *
+type DepotsListReq struct {
+	PageReqCommon
+}
+
+// DepotsListRes is the response for DepotsListReq
+type DepotsListRes struct {
+	ResCommon
+	Total int64   `json:"total"` // 总的操作日志记录数
+	Rows  []Depot `json:"rows"`  // 操作日志列表指定页数据
+}
+
+// AddDepotReq 提交添加一个新仓库的请求
+// path: '/location/depots/add'
+// method: *
+type AddDepotReq struct {
+	ReqCommon
+	Insert Depot `json:"insert"` // 添加的仓库信息
+}
+
+// AddDepotRes is the response for AddDepotReq
+type AddDepotRes struct {
+	ResCommon
+}
+
+// UpdateDepotReq 提交更新一个仓库的请求, 仅更新仓库属性，不更新货架信息
+// path: '/location/depots/update'
+// method: *
+type UpdateDepotReq struct {
+	ReqCommon
+	Update Depot `json:"update"` //  需要更新的仓库信息
+}
+
+// UpdateDepotRes is the response for UpdateDepotReq
+type UpdateDepotRes struct {
+	ResCommon
+}
+
+// DeleteDepotReq 提交删除仓库的请求
+// path: '/location/depots/update'
+// method: *
+type DeleteDepotReq struct {
+	ReqCommon
+	DepotIds []int64 `json:"depot_ids"` //  需要删除的仓库信息
+}
+
+// DeleteDepotRes is the response for DeleteDepotReq
+type DeleteDepotRes struct {
+	ResCommon
+}
+
+// ShelfsListReq 获取仓库货架数据
+// path: '/location/shelfs/list'
+// method: *
+type ShelfsListReq struct {
+	PageReqCommon
+	DepotID int64 `json:"depot_id"` // 货架所在的仓库ID
+}
+
+// ShelfsListRes is the response for ShelfsListReq
+type ShelfsListRes struct {
+	ResCommon
+	Total int64   `json:"total"` // 总的操作日志记录数
+	Rows  []Shelf `json:"rows"`  // 操作日志列表指定页数据
+}
+
+// AddShelfsReq 提交添加一个新仓库货架的请求
+// path: '/location/shelfs/add'
+// method: *
+type AddShelfsReq struct {
+	ReqCommon
+	DepotID int64   `json:"depot_id"`
+	Shelfs  []Shelf `json:"shelfs"` // 添加的仓库信息
+}
+
+// AddShelfsRes is the response for AddShelfsReq
+type AddShelfsRes struct {
+	ResCommon
+}
+
+// UpdateShelfReq 提交更新一个仓库货架的请求
+// path: '/location/shelfs/update'
+// method: *
+type UpdateShelfReq struct {
+	ReqCommon
+	Update Shelf `json:"update"` //  需要更新的仓库货架信息
+}
+
+// UpdateShelfRes is the response for UpdateShelfReq
+type UpdateShelfRes struct {
+	ResCommon
+}
+
+// DeleteShelfReq 提交删除仓库货架的请求
+// path: '/location/shelfs/delete'
+// method: *
+type DeleteShelfReq struct {
+	ReqCommon
+	ShelfIds []int64 `json:"shelf_ids"` //  需要删除的仓库货架信息
+}
+
+// DeleteShelfRes is the response for DeleteShelfReq
+type DeleteShelfRes struct {
+	ResCommon
 }

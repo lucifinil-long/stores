@@ -65,7 +65,7 @@ func protoNewUser2DBUser(user *proto.NewUser) *db.StoresUser {
 }
 
 // assignAccessToRole assign accesses to user
-func assignAccessToRole(session *xorm.Session, rid int, accesses []int) error {
+func assignAccessToRole(session *xorm.Session, rid int64, accesses []int64) error {
 	records := []db.StoresRoleNode{}
 	err := session.Table(cTableStoresRoleNode).Where("role_id=?", rid).Find(&records)
 	sql, params := session.LastSQL()
@@ -116,7 +116,7 @@ func assignAccessToRole(session *xorm.Session, rid int, accesses []int) error {
 }
 
 // removeAccessOfRole remove accesses of user
-func removeAccessOfRole(session *xorm.Session, rid int) error {
+func removeAccessOfRole(session *xorm.Session, rid int64) error {
 	_, err := session.Table(cTableStoresRoleNode).Where("role_id=?", rid).Delete(db.StoresRoleNode{})
 	sql, params := session.LastSQL()
 	log.Trace("models.removeAccessOfRole: sql: `%v`, parameters: %v, error: %v", sql, params, err)
@@ -125,7 +125,7 @@ func removeAccessOfRole(session *xorm.Session, rid int) error {
 }
 
 // IsSuperAdmin test whether user is super administrator role
-func IsSuperAdmin(uid int) bool {
+func IsSuperAdmin(uid int64) bool {
 	return uid == -1
 }
 
@@ -133,7 +133,7 @@ func IsSuperAdmin(uid int) bool {
 // @param uid is the user id of specified user
 // @return (map[string]bool, nil) if get access list successfully, otherwise return (nil, error)
 //	Note that if no node that user can access, also return (empty map[string]bool, nil)
-func GetUserAccessList(uid int) (map[string]bool, error) {
+func GetUserAccessList(uid int64) (map[string]bool, error) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
@@ -159,7 +159,7 @@ func GetUserAccessList(uid int) (map[string]bool, error) {
 // @param uid is the user id of specified user
 // @param onlyAuthNode indicates whether only auth need nodes are returned
 // @return ([]*db.StoresNode, nil) if successful; otherwise return ([]*db.StoresNode, error)
-func getUserAccessList(session *xorm.Session, uid int, onlyAuthNode bool) ([]*db.StoresNode, error) {
+func getUserAccessList(session *xorm.Session, uid int64, onlyAuthNode bool) ([]*db.StoresNode, error) {
 	if session == nil {
 		session = config.GetConfigs().OrmEngine.NewSession()
 		defer session.Close()
@@ -226,7 +226,7 @@ func getUserInfoByUserIDOrMobile(session *xorm.Session, uid int64) ([]*db.Stores
 
 // UpdateUserLoginTime updates user last login time
 // @param uid is the user id of specified user
-func UpdateUserLoginTime(uid int) {
+func UpdateUserLoginTime(uid int64) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
@@ -236,7 +236,7 @@ func UpdateUserLoginTime(uid int) {
 // updateUserLoginTime updates user last login time to DB
 // @param session is the database session, can not be nil
 // @param uid is the user id of specified user
-func updateUserLoginTime(session *xorm.Session, uid int) {
+func updateUserLoginTime(session *xorm.Session, uid int64) {
 	user := db.StoresUser{Id: uid, LastLoginTime: time.Now()}
 	updates, err := session.Table(user).Where("id=?", uid).Cols("last_login_time").Update(user)
 	if err != nil || updates != 1 {
@@ -250,7 +250,7 @@ func updateUserLoginTime(session *xorm.Session, uid int) {
 // @param uid is the user id of the user will be updated
 // @param newPwd is new password for the user
 // @return nil if successfully, otherwise return error
-func UpdateUserPassword(uid int, newPwd string) error {
+func UpdateUserPassword(uid int64, newPwd string) error {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
@@ -262,7 +262,7 @@ func UpdateUserPassword(uid int, newPwd string) error {
 // @param uid is the user id of the user will be updated
 // @param newPwd is new password for the user
 // @return nil if successfully, otherwise return error
-func updateUserPassword(session *xorm.Session, uid int, newPwd string) error {
+func updateUserPassword(session *xorm.Session, uid int64, newPwd string) error {
 	user := db.StoresUser{
 		Id:       uid,
 		Password: newPwd,
@@ -401,7 +401,7 @@ func addDBUser(session *xorm.Session, user *db.StoresUser) error {
 // DeleteUser delete specified user
 // @param uid is the user id in database
 // @return nil if successful; otherwise return an error
-func DeleteUser(uid int) error {
+func DeleteUser(uid int64) error {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
@@ -425,7 +425,7 @@ func DeleteUser(uid int) error {
 // @param session is the database session, can be nil; if nil will use default database session
 // @param uid is the user id in database
 // @return nil if successful; otherwise return an error
-func deleteUser(session *xorm.Session, uid int) error {
+func deleteUser(session *xorm.Session, uid int64) error {
 	err := deleteDBUser(session, uid)
 	if err != nil {
 		return err
@@ -438,7 +438,7 @@ func deleteUser(session *xorm.Session, uid int) error {
 // @param session is the database session, can be nil; if nil will use default database session
 // @param uid is the user id in database
 // @return nil if successful; otherwise return an error
-func deleteDBUser(session *xorm.Session, uid int) error {
+func deleteDBUser(session *xorm.Session, uid int64) error {
 	user := &db.StoresUser{Id: uid, Deleted: 1}
 	_, err := session.Table(user).
 		Where("id=?", uid).
@@ -452,7 +452,7 @@ func deleteDBUser(session *xorm.Session, uid int) error {
 // @param uid is the user id in database
 // @param columns is user database columns name to be queried
 // @return (*db.StoresUser, nil) if successful; otherwise return (nil, error)
-func GetUser(uid int, columns ...string) (*db.StoresUser, error) {
+func GetUser(uid int64, columns ...string) (*db.StoresUser, error) {
 	session := config.GetConfigs().OrmEngine.NewSession()
 	defer session.Close()
 
