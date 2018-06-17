@@ -5,6 +5,6 @@ package db
 
 // StoresCommodity is the database model struct
 type StoresCommodity struct {
-	Id   int64  `json:"id" xorm:"pk autoincr BIGINT(20)"`
-	Name string `json:"name" xorm:"not null VARCHAR(128)"`
+	Id            int64  `json:"id" xorm:"pk autoincr BIGINT(20)"`
+	CommodityName string `json:"commodity_name" xorm:"not null VARCHAR(128)"`
 }
