@@ -5,6 +5,6 @@ package db
 
 // StoresSkuProperty is the database model struct
 type StoresSkuProperty struct {
-	Id   int64  `json:"id" xorm:"pk autoincr BIGINT(20)"`
-	Name string `json:"name" xorm:"not null VARCHAR(64)"`
+	Id       int64  `json:"id" xorm:"pk autoincr BIGINT(20)"`
+	Property string `json:"property" xorm:"not null VARCHAR(64)"`
 }

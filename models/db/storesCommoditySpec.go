@@ -9,6 +9,6 @@ type StoresCommoditySpec struct {
 	Name          string `json:"name" xorm:"not null VARCHAR(64)"`
 	Detail        string `json:"detail" xorm:"not null VARCHAR(128)"`
 	Segmentable   int    `json:"segmentable" xorm:"not null default 0 TINYINT(4)"`
-	SegmentId     int64  `json:"segment_id" xorm:"index BIGINT(20)"`
+	SegmentId     int64  `json:"segment_id" xorm:"BIGINT(20)"`
 	SegmentAmount int    `json:"segment_amount" xorm:"INT(11)"`
 }

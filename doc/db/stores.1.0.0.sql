@@ -213,6 +213,8 @@ CREATE TABLE `stores_commodity_sku` (
   `name` varchar(64) NOT NULL COMMENT 'SKU名称',
   `barcode` varchar(64) NOT NULL DEFAULT '' COMMENT '条码',
   `spec_id` bigint(20) NOT NULL COMMENT '关联规格ID',
+  `profit` int(11) NOT NULL DEFAULT 20 COMMENT '利润率，基准销售价为 成本价 * (100 + profit)',
+  `max_discount` tinyint(4) NULL DEFAULT 0 COMMENT '在基准销售价基础上允许的最大折扣幅度, 0~100',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_bc` (`barcode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -222,7 +224,7 @@ CREATE TABLE `stores_commodity_sku` (
  */
 CREATE TABLE `stores_sku_property` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) NOT NULL COMMENT 'SKU属性名称',
+  `property` varchar(64) NOT NULL COMMENT 'SKU属性名称',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -242,6 +244,7 @@ CREATE TABLE `stores_sku_property_value` (
 CREATE TABLE `stores_sku_stock` (
   `sku_id` bigint(20) NOT NULL COMMENT 'SKU ID',
   `shelf_id` bigint(20) NOT NULL COMMENT '货架',
+  `price`  double(10,2) NOT NULL COMMENT '存货进价平均数',
   `amount` bigint(20) NOT NULL DEFAULT 0 COMMENT '库存数量',
   PRIMARY KEY (`sku_id`, `shelf_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -254,6 +257,7 @@ CREATE TABLE `stores_sku_stock_change` (
   `sku_id` bigint(20) NOT NULL COMMENT 'SKU ID',
   `shelf_id` bigint(20) NOT NULL COMMENT '货架',
   `layer` varchar(64) NULL COMMENT '货架层数',
+  `price` double(10,2) NOT NULL COMMENT '入库、拆包入库时为入库价格；销售出库时为售价；拆包出库时为存货进价平均数',
   `amount` bigint(20) NOT NULL DEFAULT 0 COMMENT '库存数量',
   `type` tinyint NOT NULL COMMENT '变动类型：1采购入库；2销售出库；3拆包出库；4拆包入库',
   `operator_id` bigint(20) NOT NULL COMMENT '操作人',
