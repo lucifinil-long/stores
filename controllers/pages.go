@@ -41,8 +41,14 @@ func (pc *PageController) CommoditiesPage() {
 	pc.OperationLog(cActionViewOperationLogsList)
 }
 
-// AdminLocationsPage handles location page request
+// AdminLocationsPage handles locations page request
 func (pc *PageController) AdminLocationsPage() {
 	pc.TplName = "easyui/admin/locations.tpl"
-	pc.OperationLog(cActionViewLocationList)
+	pc.OperationLog(cActionViewLocationsList)
+}
+
+// AdminSpecificationsPage handles specifications page request
+func (pc *PageController) AdminSpecificationsPage() {
+	pc.TplName = "easyui/admin/specifications.tpl"
+	pc.OperationLog(cActionViewSpecificationsList)
 }

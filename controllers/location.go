@@ -98,9 +98,9 @@ func (lc *LocationController) UpdateDepot() {
 		Status:   proto.ReturnStatusFailed,
 		Protocol: &proto.UpdateDepotRes{},
 	}
-	insertedJSON := lc.GetString(cUpdated)
+	updateJSON := lc.GetString(cUpdated)
 	depot := &proto.Depot{}
-	json.Unmarshal([]byte(insertedJSON), depot)
+	json.Unmarshal([]byte(updateJSON), depot)
 
 	if len(depot.Name) == 0 {
 		rsp.Description = proto.ErrCommonInvalidParam.Error()

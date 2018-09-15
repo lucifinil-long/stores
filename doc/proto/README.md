@@ -64,7 +64,7 @@ API请求接口使用统一的返回JSON结构：
 		"attributes": {
 			"url": "value" // 节点对应的页面url
 		},
-		"children": [] // 子节点列表，与父节点结构相同
+		"children": [{}] // 子节点列表，与父节点结构相同
 	}
 ]
 ```
@@ -145,7 +145,7 @@ old=xxx&new=xxx&repeat=xxx
 		"auth": 0, // 授权需要，参见AuthStatus定义
 		"icon": "value", // 图标
 		"remark": "value", // 备注
-		"children": [] // 子节点列表，与父节点结构相同
+		"children": [{}] // 子节点列表，与父节点结构相同
 	}
 ]
 ```
@@ -472,6 +472,100 @@ shelf_ids=xxx
 // 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
 {
 	"shelf_ids": [0] //  需要删除的仓库货架信息
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/admin/specifications/list' 获取规格数据
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+page=xxx&rows=xxx&sort=xxx&order=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"page": 0, // 请求分页数据的第几页数据，必填项
+	"rows": 0, // 每页数据的分页条数，必填项
+	"sort": "value", // 排序字段名，取值为下发的邮件服务配置数据的字段，可选项
+	"order": "value", // 排序方向，参见SortDirection定义，可选项
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+{
+	"total": 0, // 总的操作日志记录数
+	"rows": [
+	{
+			"id": 0, // 规格ID
+			"name": "value", // 规格名称
+			"detail": "value", // 规格详情
+			"parent": {}, // 父级规格
+			"segmentable": 0, // 是否可拆分为其他规格
+			"sub": {}, // 子级规格
+			"sub_amount": 0 // 可拆分为子级规格数量
+		}
+	] // 操作日志列表指定页数据
+}
+```
+
+### API接口'/admin/specifications/add' 提交添加一个新规格的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+spec=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"spec": {
+		"id": 0, // 规格ID
+		"name": "value", // 规格名称
+		"detail": "value", // 规格详情
+		"parent_id": 0, // 父级规格ID
+		"amount": 0, // 父级规格ID可以拆分为本级规格的数量
+		"segmentable": 0, // 是否可拆分为其他规格
+		"sub_id": 0, // 可拆分的子级规格ID
+		"sub_amount": 0 // 拆分为子级规格的数量
+	}
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/admin/specifications/update' 提交更新一个规格的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+update=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"update": {
+		"id": 0, // 规格ID
+		"name": "value", // 规格名称
+		"detail": "value", // 规格详情
+		"parent_id": 0, // 父级规格ID
+		"amount": 0, // 父级规格ID可以拆分为本级规格的数量
+		"segmentable": 0, // 是否可拆分为其他规格
+		"sub_id": 0, // 可拆分的子级规格ID
+		"sub_amount": 0 // 拆分为子级规格的数量
+	}
+}
+
+// 返回JSON示例(仅Response.Protocol部分)
+本接口不返回json格式数据
+```
+
+### API接口'/admin/specifications/delete' 提交删除规格的请求
+ 访问方法: *
+
+```js
+// 请求表单参数示例
+spec_ids=xxx
+// 请求表单参数内容格式说明(参数值为json对象的，值对应为json对象的字符串内容)
+{
+	"spec_ids": [0] //  需要删除的规格ID列表
 }
 
 // 返回JSON示例(仅Response.Protocol部分)

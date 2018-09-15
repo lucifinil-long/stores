@@ -32,6 +32,19 @@ var (
 )
 
 var (
+	// ErrParentSpecIsNotExist is the error for parent spect is not exist
+	ErrParentSpecIsNotExist = errors.New("指定父级规格不存在")
+	// ErrParentHasChild is the error for parent spect has child yet
+	ErrParentHasChild = errors.New("指定父级规格已经存在子级规格")
+	// ErrChildSpecIsNotExist is the error for child spect is not exist
+	ErrChildSpecIsNotExist = errors.New("指定子级规格不存在")
+	// ErrChildHasParent is the error for child spect has parent yet
+	ErrChildHasParent = errors.New("指定父级规格已经存在子级规格")
+	// ErrDeleteSkuBeforeSpec is the error that indicates must delete related sku before spec
+	ErrDeleteSkuBeforeSpec = errors.New("指定规格已经关联到SKU，请先删除关联SKU再删除规格")
+)
+
+var (
 	// ErrCommonInvalidParam is common invalid parameter error
 	ErrCommonInvalidParam = errors.New("错误参数")
 	// ErrCommonInternalError is common internal error
@@ -49,4 +62,6 @@ var (
 	ErrNotStructType = errors.New("非结构类型。")
 	// ErrInvalidValueForNutNullField is the error for there is nil for not null field
 	ErrInvalidValueForNutNullField = errors.New("非空字段必须填写有效值。")
+	// ErrRecordIsNotExist is error for record is not exist
+	ErrRecordIsNotExist = errors.New("记录不存在")
 )

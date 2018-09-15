@@ -9,4 +9,6 @@ const (
 	cTableStoresRoleUser      = "stores_role_user"
 	cTableStoresLocationDepot = "stores_location_depot"
 	cTableStoresLocationShelf = "stores_location_shelf"
+	cTableStoresSpecification = "stores_commodity_spec"
+	cTableStoresCommoditySku  = "stores_commodity_sku"
 )

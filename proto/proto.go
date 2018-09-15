@@ -464,3 +464,79 @@ type DeleteShelfReq struct {
 type DeleteShelfRes struct {
 	ResCommon
 }
+
+// SpecEntry is the commodity specification
+type SpecEntry struct {
+	ID          int64  `json:"id"`          // 规格ID
+	Name        string `json:"name"`        // 规格名称
+	Detail      string `json:"detail"`      // 规格详情
+	ParentID    int64  `json:"parent_id"`   // 父级规格ID
+	Amount      int    `json:"amount"`      // 父级规格ID可以拆分为本级规格的数量
+	Segmentable int    `json:"segmentable"` // 是否可拆分为其他规格
+	SubID       int64  `json:"sub_id"`      // 可拆分的子级规格ID
+	SubAmount   int    `json:"sub_amount"`  // 拆分为子级规格的数量
+}
+
+// Specification is the commodity specification
+type Specification struct {
+	ID          int64          `json:"id"`          // 规格ID
+	Name        string         `json:"name"`        // 规格名称
+	Detail      string         `json:"detail"`      // 规格详情
+	Parent      *Specification `json:"parent"`      // 父级规格
+	Segmentable int            `json:"segmentable"` // 是否可拆分为其他规格
+	Sub         *Specification `json:"sub"`         // 子级规格
+	SubAmount   int            `json:"sub_amount"`  // 可拆分为子级规格数量
+}
+
+// SpecificationListReq 获取规格数据
+// path: '/admin/specifications/list'
+// method: *
+type SpecificationListReq struct {
+	PageReqCommon
+}
+
+// SpecificationListRes is the response for SpecificationListReq
+type SpecificationListRes struct {
+	ResCommon
+	Total int64           `json:"total"` // 总的操作日志记录数
+	Rows  []Specification `json:"rows"`  // 操作日志列表指定页数据
+}
+
+// AddSpecificationReq 提交添加一个新规格的请求
+// path: '/admin/specifications/add'
+// method: *
+type AddSpecificationReq struct {
+	ReqCommon
+	Insert SpecEntry `json:"insert"` // 添加的仓库信息
+}
+
+// AddSpecificationRes is the response for AddSpecificationReq
+type AddSpecificationRes struct {
+	ResCommon
+}
+
+// UpdateSpecificationReq 提交更新一个规格的请求
+// path: '/admin/specifications/update'
+// method: *
+type UpdateSpecificationReq struct {
+	ReqCommon
+	Update SpecEntry `json:"update"` //  需要更新的规格信息
+}
+
+// UpdateSpecificationRes is the response for UpdateSpecificationReq
+type UpdateSpecificationRes struct {
+	ResCommon
+}
+
+// DeleteSpecificationReq 提交删除规格的请求
+// path: '/admin/specifications/delete'
+// method: *
+type DeleteSpecificationReq struct {
+	ReqCommon
+	SpecDetailID []int64 `json:"spec_ids"` //  需要删除的规格ID列表
+}
+
+// DeleteSpecificationRes is the response for DeleteSpecificationReq
+type DeleteSpecificationRes struct {
+	ResCommon
+}

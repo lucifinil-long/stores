@@ -476,7 +476,7 @@ func (typ Type) JSON(structs []Struct, prefix string) string {
 	case "any":
 		return "{}"
 	case "empty":
-		return ""
+		return "{}"
 	default:
 		return "0"
 	}

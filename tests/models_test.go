@@ -7,12 +7,52 @@ import (
 	"time"
 
 	"github.com/lucifinil-long/stores/models"
+	"github.com/lucifinil-long/stores/proto"
 	"github.com/mkideal/log"
 )
 
 func TestModels(t *testing.T) {
 	log.Info("Models unittests start...")
 	time.Sleep(10 * time.Millisecond)
+}
+
+func TestAddSpec(t *testing.T) {
+	specs, count, err := models.SpecList(0, 100, "", false, false)
+	newSpec := &proto.SpecEntry{
+		Name: fmt.Sprintf("%v", count+1),
+	}
+
+	if err != nil {
+		log.Fatal("models.SpecList failed with %v", err)
+	}
+
+	spec, err := models.AddSpec(newSpec)
+	if err != nil {
+		log.Fatal("models.AddSpec failed with %v", err)
+	}
+	result, _ := json.MarshalIndent(spec, "", "    ")
+	log.Info("models.AddSpec returned %v, error: %v", string(result), err)
+
+	newSpec = &proto.SpecEntry{
+		Name:     fmt.Sprintf("%v", count+2),
+		ParentID: spec.ID,
+		Amount:   10,
+	}
+
+	spec, err = models.AddSpec(newSpec)
+	if err != nil {
+		log.Fatal("models.AddSpec failed with %v", err)
+	}
+
+	specs, count, err = models.SpecList(0, 100, "", false, true)
+	if err != nil {
+		log.Fatal("models.SpecList failed with %v", err)
+	}
+
+	result, _ = json.MarshalIndent(specs, "", "    ")
+	log.Info("models.SpecList returned %v, count: %v, error: %v", string(result), count, err)
+
+	time.Sleep(100 * time.Millisecond)
 }
 
 // func TestGetUserInfoByUserIDOrMobile(t *testing.T) {
@@ -100,24 +140,24 @@ func TestModels(t *testing.T) {
 // 	time.Sleep(100 * time.Millisecond)
 // }
 
-func TestGetAllDepotsAndUpdate(t *testing.T) {
-	records, count, err := models.GetDepots(0, 50, "", false)
+// func TestGetAllDepotsAndUpdate(t *testing.T) {
+// 	records, count, err := models.GetDepots(0, 50, "", false)
 
-	for _, record := range records {
-		record.Detail = fmt.Sprintf("%v %v", record.Name, time.Now())
-		err = models.UpdateDepotProperties(&record)
-		log.Info("models.UpdateDepotProperties is done with error %v.\n\n", err)
-	}
+// 	for _, record := range records {
+// 		record.Detail = fmt.Sprintf("%v %v", record.Name, time.Now())
+// 		err = models.UpdateDepotProperties(&record)
+// 		log.Info("models.UpdateDepotProperties is done with error %v.\n\n", err)
+// 	}
 
-	records, count, err = models.GetDepots(0, 50, "", false)
-	result, _ := json.MarshalIndent(records, "", "    ")
+// 	records, count, err = models.GetDepots(0, 50, "", false)
+// 	result, _ := json.MarshalIndent(records, "", "    ")
 
-	log.Info("models.GetDepots: %v records in first page\n%v\nerror: %v", count, string(result), err)
+// 	log.Info("models.GetDepots: %v records in first page\n%v\nerror: %v", count, string(result), err)
 
-	log.Info("TestGetAllDepotsAndUpdate is done.\n\n")
+// 	log.Info("TestGetAllDepotsAndUpdate is done.\n\n")
 
-	time.Sleep(100 * time.Millisecond)
-}
+// 	time.Sleep(100 * time.Millisecond)
+// }
 
 // func TestDeleteDepots(t *testing.T) {
 // 	records, err := models.GetAllDepots()

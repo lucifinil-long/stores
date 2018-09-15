@@ -34,16 +34,17 @@ const (
 )
 
 const (
-	cActionLogin                 = "用户登录"
-	cActionLoginOut              = "用户登出"
-	cActionModifyPwd             = "修改登录密码"
-	cActionAddUser               = "添加用户"
-	cActionUpdateUser            = "更新用户"
-	cActionDeleteUser            = "删除用户"
-	cActionViewUserList          = "查看仓储管理系统用户列表"
-	cActionViewOperationLogsList = "查看仓储管理系统操作日志"
-	cActionViewCommoditiesList   = "查看商品定义列表"
-	cActionViewLocationList      = "查看库房列表"
+	cActionLogin                  = "用户登录"
+	cActionLoginOut               = "用户登出"
+	cActionModifyPwd              = "修改登录密码"
+	cActionAddUser                = "添加用户"
+	cActionUpdateUser             = "更新用户"
+	cActionDeleteUser             = "删除用户"
+	cActionViewUserList           = "查看仓储管理系统用户列表"
+	cActionViewOperationLogsList  = "查看仓储管理系统操作日志"
+	cActionViewCommoditiesList    = "查看商品定义列表"
+	cActionViewLocationsList      = "查看库房列表"
+	cActionViewSpecificationsList = "查看规格列表"
 )
 
 const (

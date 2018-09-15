@@ -46,7 +46,7 @@ INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)       
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('21', '自定义报表', '/pages/statistics/custom', '2', '2', '1');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('90', '商品设置', '/pages/admin/commodities', '2', '9', '1');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('91', '库房设置', '/pages/admin/locations', '2', '9', '1');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('92', '商品规格设置', '/pages/admin/specification', '2', '9', '1');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('92', '商品规格设置', '/pages/admin/specifications', '2', '9', '1');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('97', '用户管理', '/pages/admin/users', '2', '9', '1');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`, `menu`)           VALUES ('98', '系统操作日志', '/pages/admin/operations', '2', '9', '1');
 /* 用户权限列表操作 */
@@ -71,14 +71,14 @@ INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)               
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('901', '新增商品', '/admin/commodities/add', '4', '900');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('902', '商品修改', '/admin/commodities/update', '4', '900');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('903', '删除商品', '/admin/commodities/delete', '4', '900');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('904', '商品规格列表', '/admin/commodity/specifications/list', '3', '90');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('905', '新增商品规格', '/admin/commodity/specifications/add', '4', '904');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('906', '修改商品规格', '/admin/commodity/specifications/update', '4', '904');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('907', '删除商品规格', '/admin/commodity/specifications/delete', '4', '904');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('9000', '商品SKU列表', '/admin/commodities/sku/list', '4', '900');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('9001', '新增商品SKU', '/admin/commodities/sku/add', '5', '9000');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('9002', '商品SKU修改', '/admin/commodities/sku/update', '5', '9000');
-INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('9003', '删除商品SKU', '/admin/commodities//sku/delete', '5', '9000');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('9003', '删除商品SKU', '/admin/commodities/sku/delete', '5', '9000');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('920', '商品规格列表', '/admin/specifications/list', '3', '92');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('921', '新增商品规格', '/admin/specifications/add', '4', '920');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('922', '修改商品规格', '/admin/specifications/update', '4', '920');
+INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('923', '删除商品规格', '/admin/specifications/delete', '4', '920');
 /* 库房设置操作 */
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('910', '库房列表', '/admin/depot/list', '3', '91');
 INSERT INTO `stores_node` (`id`, `title`, `path`, `level`, `pid`)                   VALUES ('911', '新增库房', '/admin/depot/add', '4', '910');
@@ -204,10 +204,13 @@ CREATE TABLE `stores_commodity_spec` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `spec_name` varchar(64) NOT NULL COMMENT '规格名称',
   `detail` varchar(128) NOT NULL COMMENT '描述',
-  `segmentable` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否可拆分',
-  `segment_id` bigint(20) NULL COMMENT '可拆分的下级ID',
-  `segment_amount` int(11) NULL COMMENT '可拆分的下级规格数量',
-  PRIMARY KEY (`id`)
+  `parent_id` bigint(20) NOT NULL DEFAULT 0 COMMENT '父级ID',
+  `segmentable` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否可拆分',
+  `sub_id` bigint(20) NULL DEFAULT 0 COMMENT '可拆分的子级ID',
+  `sub_amount` int(11) NULL DEFAULT 0 COMMENT '可拆分的子级规格数量',
+  PRIMARY KEY (`id`),
+  KEY `idx_pid` (`parent_id`),
+  KEY `idx_sid` (`sub_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /* 
