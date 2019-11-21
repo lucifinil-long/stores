@@ -12,6 +12,7 @@ import (
 	_ "github.com/go-sql-driver/mysql" // xorm will use this driver
 	"github.com/go-xorm/xorm"
 	"github.com/lucifinil-long/stores/utils"
+	_ "github.com/mattn/go-sqlite3" // xorm will use this driver
 	"github.com/mkideal/log"
 )
 
@@ -30,6 +31,7 @@ const (
 const (
 	cDBDriver           = "db_driver"
 	cMysqlDBDriver      = "mysql"
+	cSqliteDBDriver     = "sqlite3"
 	cDBHost             = "db_host"
 	cDBUser             = "db_user"
 	cDBUserPwd          = "db_pwd"
@@ -84,16 +86,16 @@ func initLog(cfg *Configs) error {
 		logPath = filepath.Join(appPath, logPath)
 	}
 
-	if err := log.Init("multifile/console", log.M{
-		"rootdir":     logPath,
-		"suffix":      ".txt",
-		"date_format": "%04d-%02d-%02d",
-	}); err != nil {
-		return err
-	}
+	// if err := log.Init("multifile/console", log.M{
+	// 	"rootdir":     logPath,
+	// 	"suffix":      ".txt",
+	// 	"date_format": "%04d-%02d-%02d",
+	// }); err != nil {
+	// 	return err
+	// }
 
-	logLevel := beego.AppConfig.String(cLogLevel)
-	log.Info("log level: %v, wanted level: %v", log.SetLevelFromString(logLevel), logLevel)
+	// logLevel := beego.AppConfig.String(cLogLevel)
+	// log.Info("log level: %v, wanted level: %v", log.SetLevelFromString(logLevel), logLevel)
 	return nil
 }
 
@@ -134,11 +136,15 @@ func (cfg *Configs) initOrmEngine() error {
 		if cfg.OrmEngine, err = xorm.NewEngine(dbDriver, dataSourceName); err != nil {
 			return err
 		}
-		log.Info("initOrmEngine is done successfully.")
+	} else if strings.EqualFold(dbDriver, cSqliteDBDriver) {
+		if cfg.OrmEngine, err = xorm.NewEngine(dbDriver, dbName); err != nil {
+			return err
+		}
 	} else {
 		return fmt.Errorf("not supportted db driver: %v", dbDriver)
 	}
 
+	log.Info("initOrmEngine done successfully.")
 	return nil
 }
 

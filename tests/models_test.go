@@ -1,14 +1,16 @@
 package test
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/lucifinil-long/stores/models"
-	"github.com/lucifinil-long/stores/proto"
+	"github.com/go-xorm/xorm"
+	"github.com/lucifinil-long/stores/config"
+	"github.com/lucifinil-long/stores/models/db"
 	"github.com/mkideal/log"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func TestModels(t *testing.T) {
@@ -16,44 +18,104 @@ func TestModels(t *testing.T) {
 	time.Sleep(10 * time.Millisecond)
 }
 
-func TestAddSpec(t *testing.T) {
-	specs, count, err := models.SpecList(0, 100, "", false, false)
-	newSpec := &proto.SpecEntry{
-		Name: fmt.Sprintf("%v", count+1),
-	}
+// func TestSqliteEngine(t *testing.T) {
+// 	cfg := config.GetConfigs()
 
+// 	if cfg.OrmEngine == nil {
+// 		log.Info("Orm Engine is nil")
+// 	} else {
+// 		session := cfg.OrmEngine.NewSession()
+// 		defer session.Close()
+// 		users := make([]db.StoresUser, 0)
+// 		if err := session.Find(&users); err != nil {
+// 			log.Info("Query get error %v", err)
+// 		} else {
+// 			log.Info("%v", users)
+// 		}
+// 	}
+
+// }
+
+func TestBuildSqlit(t *testing.T) {
+	session := config.GetConfigs().OrmEngine.NewSession()
+	defer session.Close()
+	orm, err := xorm.NewEngine("sqlite3", "file:../db/test.db?_auth&_auth_user=admin&_auth_pass=admin")
 	if err != nil {
-		log.Fatal("models.SpecList failed with %v", err)
+		fmt.Println("error:", err)
+	} else {
+		defer orm.Close()
+
+		orm.Sync(new(db.StoresNode))
+		orm.Sync(new(db.StoresUser))
+		orm.Sync(new(db.StoresOpLog))
+		orm.Sync(new(db.StoresRole))
+		orm.Sync(new(db.StoresRoleNode))
+		orm.Sync(new(db.StoresRoleUser))
+		orm.Sync(new(db.StoresLocationDepot))
+		orm.Sync(new(db.StoresLocationShelf))
+		orm.Sync(new(db.StoresCommodity))
+		orm.Sync(new(db.StoresCommoditySku))
+		orm.Sync(new(db.StoresCommoditySpec))
+		orm.Sync(new(db.StoresSkuProperty))
+		orm.Sync(new(db.StoresSkuPropertyValue))
+		orm.Sync(new(db.StoresSkuStock))
+		orm.Sync(new(db.StoresSkuStockChange))
+
+		sqliteSess := orm.NewSession()
+		defer sqliteSess.Close()
+
+		nodes := make([]*db.StoresNode, 0)
+		session.Find(&nodes)
+		sqliteSess.InsertMulti(nodes)
+
+		users := make([]*db.StoresUser, 0)
+		session.Find(&users)
+		sqliteSess.InsertMulti(users)
+
+		roles := make([]*db.StoresRole, 0)
+		session.Find(&roles)
+		sqliteSess.InsertMulti(roles)
 	}
-
-	spec, err := models.AddSpec(newSpec)
-	if err != nil {
-		log.Fatal("models.AddSpec failed with %v", err)
-	}
-	result, _ := json.MarshalIndent(spec, "", "    ")
-	log.Info("models.AddSpec returned %v, error: %v", string(result), err)
-
-	newSpec = &proto.SpecEntry{
-		Name:     fmt.Sprintf("%v", count+2),
-		ParentID: spec.ID,
-		Amount:   10,
-	}
-
-	spec, err = models.AddSpec(newSpec)
-	if err != nil {
-		log.Fatal("models.AddSpec failed with %v", err)
-	}
-
-	specs, count, err = models.SpecList(0, 100, "", false, true)
-	if err != nil {
-		log.Fatal("models.SpecList failed with %v", err)
-	}
-
-	result, _ = json.MarshalIndent(specs, "", "    ")
-	log.Info("models.SpecList returned %v, count: %v, error: %v", string(result), count, err)
-
-	time.Sleep(100 * time.Millisecond)
 }
+
+// func TestAddSpec(t *testing.T) {
+// 	specs, count, err := models.SpecList(0, 100, "", false, false)
+// 	newSpec := &proto.SpecEntry{
+// 		Name: fmt.Sprintf("%v", count+1),
+// 	}
+
+// 	if err != nil {
+// 		log.Fatal("models.SpecList failed with %v", err)
+// 	}
+
+// 	spec, err := models.AddSpec(newSpec)
+// 	if err != nil {
+// 		log.Fatal("models.AddSpec failed with %v", err)
+// 	}
+// 	result, _ := json.MarshalIndent(spec, "", "    ")
+// 	log.Info("models.AddSpec returned %v, error: %v", string(result), err)
+
+// 	newSpec = &proto.SpecEntry{
+// 		Name:     fmt.Sprintf("%v", count+2),
+// 		ParentID: spec.ID,
+// 		Amount:   10,
+// 	}
+
+// 	spec, err = models.AddSpec(newSpec)
+// 	if err != nil {
+// 		log.Fatal("models.AddSpec failed with %v", err)
+// 	}
+
+// 	specs, count, err = models.SpecList(0, 100, "", false, true)
+// 	if err != nil {
+// 		log.Fatal("models.SpecList failed with %v", err)
+// 	}
+
+// 	result, _ = json.MarshalIndent(specs, "", "    ")
+// 	log.Info("models.SpecList returned %v, count: %v, error: %v", string(result), count, err)
+
+// 	time.Sleep(100 * time.Millisecond)
+// }
 
 // func TestGetUserInfoByUserIDOrMobile(t *testing.T) {
 // 	users, err := models.GetUserInfoByUserIDOrMobile(-1)
@@ -235,3 +297,7 @@ func TestAddSpec(t *testing.T) {
 
 // 	time.Sleep(100 * time.Millisecond)
 // }
+
+func TestModelsDone(t *testing.T) {
+	log.Info("All tests for models are done.")
+}

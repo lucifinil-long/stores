@@ -1,4 +1,5 @@
 conf/server.key.org
 .vscode/settings.json
 logs/*
-stores
+./stores
+.DS_Store
