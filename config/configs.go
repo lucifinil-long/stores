@@ -86,16 +86,16 @@ func initLog(cfg *Configs) error {
 		logPath = filepath.Join(appPath, logPath)
 	}
 
-	// if err := log.Init("multifile/console", log.M{
-	// 	"rootdir":     logPath,
-	// 	"suffix":      ".txt",
-	// 	"date_format": "%04d-%02d-%02d",
-	// }); err != nil {
-	// 	return err
-	// }
+	if err := log.Init("multifile/console", log.M{
+		"rootdir":     logPath,
+		"suffix":      ".txt",
+		"date_format": "%04d-%02d-%02d",
+	}); err != nil {
+		return err
+	}
 
-	// logLevel := beego.AppConfig.String(cLogLevel)
-	// log.Info("log level: %v, wanted level: %v", log.SetLevelFromString(logLevel), logLevel)
+	logLevel := beego.AppConfig.String(cLogLevel)
+	log.Info("log level: %v, wanted level: %v", log.SetLevelFromString(logLevel), logLevel)
 	return nil
 }
 
