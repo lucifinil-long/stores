@@ -16,8 +16,9 @@ if command -v pbcopy >/dev/null 2>&1; then
 fi
 
 if [ "$1" == "db" ]; then
-    mysql -u $User -h $Host -P $Port -p $DBName < gw_admin.1.0.0.sql
+    mysql -u $User -h $Host -P $Port -p $DBName < stores.1.0.0.sql
     # patch
+	exit 1
 fi
 
 DataSourceName="$User:$Password@tcp($Host:$Port)/$DBName?charset=utf8"
