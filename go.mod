@@ -10,5 +10,5 @@ require (
 	github.com/mkideal/cli v0.2.5
 	github.com/mkideal/log v0.0.0-20170408134130-df09d4873c0a
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
-	golang.org/x/text v0.3.2
+	golang.org/x/text v0.3.8
 )
